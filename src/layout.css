@@ -6,7 +6,7 @@
 .gr-sidebar__heading { padding: 0 9px 6px; font-size: 10px; font-weight: 700; letter-spacing: .075em; color: var(--gr-ink-muted); text-transform: uppercase; }
 .gr-sidebar__link { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 32px; padding: 0 10px; border-radius: var(--gr-radius-sm); border: 0; background: transparent; text-align: left; color: var(--gr-ink-secondary); font-size: var(--gr-text-md); }
 .gr-sidebar__link svg { width: 15px; height: 15px; }
-.gr-sidebar__link:hover { background: var(--gr-surface-raised); color: var(--gr-ink); }
+@media (hover: hover) and (pointer: fine) { .gr-sidebar__link:hover { background: var(--gr-surface-raised); color: var(--gr-ink); } }
 .gr-sidebar__link[aria-current="page"] { background: var(--gr-surface); color: var(--gr-ink); font-weight: 650; box-shadow: 0 1px 3px rgb(0 0 0 / 3%); }
 .gr-sidebar__footer { margin-top: auto; padding: 15px; border-top: 1px solid var(--gr-line); }
 .gr-main { min-width: 0; min-height: 0; overflow-y: auto; background: var(--gr-canvas); }
@@ -32,4 +32,14 @@
   .gr-page { padding: 25px 16px 65px; }
   .gr-page-header { flex-direction: column; }
   .gr-grid, .gr-grid--two { grid-template-columns: 1fr; }
+}
+
+.gr-main { scroll-padding-block-start: 76px; }
+.gr-sidebar { overscroll-behavior: contain; }
+.gr-nav-scrim { display: none; }
+@media (max-width: 760px) {
+ .gr-app-shell { position: relative; }
+ .gr-sidebar { inset-inline-start: 0; left: auto; transform: translateX(-105%); }
+ .gr-app-shell[data-sidebar-open="true"] .gr-sidebar { transform: translateX(0); }
+ .gr-nav-scrim:not([hidden]) { display: block; position: fixed; inset: 0; z-index: 30; background: rgb(17 17 17 / 44%); border: 0; padding: 0; cursor: pointer; }
 }

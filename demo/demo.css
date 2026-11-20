@@ -119,3 +119,15 @@ body.gr-ui { margin: 0; height: 100dvh; overflow: hidden; }
   .demo-card-caption { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) { .gr-ui .demo-spark i { transition: none; } }
+
+.demo-hero h1, .gr-page-title { text-wrap: balance; }
+.demo-hero .gr-page-description, .gr-page-description { max-width: 65ch; }
+.demo-filter-label { pointer-events: none; }
+.demo-view-panel { padding: 14px 3px 4px; min-height: 80px; color: var(--gr-ink-secondary); }
+.demo-view-panel[hidden] { display: none; }
+.demo-view-panel strong { display: block; margin-bottom: 6px; font-size: var(--gr-text-sm); color: var(--gr-ink); }
+.demo-view-panel p { max-width: 60ch; font-size: var(--gr-text-sm); line-height: 1.6; }
+.demo-view-preview { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 11px; }
+.demo-view-preview span { display: inline-flex; align-items: center; padding: 4px 7px; border-radius: 5px; background: var(--gr-surface-muted); border: 1px solid var(--gr-line); font-size: 11px; }
+.demo-task-card .gr-task-row__title { overflow-wrap: anywhere; }
+@media (max-width: 760px) { .demo-component-card { padding: 16px; } }

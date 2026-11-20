@@ -27,12 +27,17 @@ test("semantic text contrast is >= 4.5:1 for both theme surfaces", async () => {
   const dark = css.split(':root[data-gr-theme="dark"]')[1].split(':root[data-gr-accent="teal"]')[0];
   const targets = ["--gr-ink-secondary", "--gr-ink-muted", "--gr-accent", "--gr-good", "--gr-caution", "--gr-danger", "--gr-info", "--gr-violet"];
   for (const [theme, block] of [["light", light], ["dark", dark]]) {
-    const surface = token(block, "--gr-surface");
-    for (const name of targets) {
-      const actual = ratio(token(block, name), surface);
-      assert.ok(actual >= 4.5, theme + " " + name + " has insufficient contrast: " + actual.toFixed(2));
+    for (const bgName of ["--gr-surface", "--gr-sidebar", "--gr-surface-raised"]) {
+      const surface = token(block, bgName);
+      for (const name of targets) {
+        const actual = ratio(token(block, name), surface);
+        assert.ok(actual >= 4.5, theme + " " + name + " on " + bgName + ": " + actual.toFixed(2));
+      }
     }
-    assert.ok(ratio(token(block, "--gr-control-line"), surface) >= 3, theme + " control border contrast");
+    for (const bgName of ["--gr-surface", "--gr-sidebar"]) {
+      const controlContrast = ratio(token(block, "--gr-control-line"), token(block, bgName));
+      assert.ok(controlContrast >= 3, theme + " control boundary on " + bgName + ": " + controlContrast.toFixed(2));
+    }
   }
 });
 test("switch synchronizes its state and accessible label", () => {

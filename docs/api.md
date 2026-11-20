@@ -135,3 +135,11 @@ document.querySelector("gr-switch").addEventListener("gr-change", event => {
 ## Accessibility note
 
 请提供 label / aria-label、关联字段错误描述、在使用 `gr-progress` 时补充 `role="progressbar"` 和 aria 值，并在生产环境针对具体读屏器和浏览器进行验证。此库实现基础键盘行为，并非完整的无障碍认证。
+
+## v0.2.0 交互更新
+
+- `gr-toast-stack.push`：通知现在可在 pointer hover / 键盘焦点期间暂停计时，dismiss 有可中断的退出过渡。
+- `gr-dropdown`：增加文字首字母快捷查找；ArrowDown / ArrowUp、Escape、Home、End 保留；菜单优先定位在可见视口范围内。
+- `gr-command-palette`：输入采用 `role="combobox"` 与 `aria-activedescendant`，列表采用 `role="listbox"`；无结果时提供明确反馈。
+- `gr-dialog`：保持原生 modal 的 Escape 和焦点恢复，只有实际 backdrop 点击才关闭。
+- `gr-switch`：44×36px 可点击区域，外观保留紧凑轨道。

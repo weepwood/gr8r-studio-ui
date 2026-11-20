@@ -22,3 +22,9 @@
 ## 后续可扩展方向
 
 复杂 Combobox / DatePicker、虚拟列表、React/Vue 包装层、Playwright + axe 回归测试、Figma Tokens 导出、更多业务组合。
+
+## v0.2.0：Skill 导向的改进
+
+本轮遵循两类原则：Jakub Krehel 侧重色彩角色、布局、焦点、触屏和微细节；Emil Kowalski 侧重高频操作保持无动画、低频 modal 的空间感、通过合成器友好的 opacity/transform 传递反馈。
+
+具体改进与验证范围：[Skill-guided review](skill-guided-review.md)。

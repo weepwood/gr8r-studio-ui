@@ -3,13 +3,15 @@
  * The component DOM remains in the light tree so regular CSS and app events work.
  */
 const ElementBase = typeof HTMLElement === "undefined" ? class {} : HTMLElement;
+let autoId = 0;
+const nextId = prefix => `${prefix}-${++autoId}`;
 
 function emit(host, name, detail) {
   host.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
 }
 
 export class GrSwitch extends ElementBase {
-  static get observedAttributes() { return ["checked", "disabled"]; }
+  static get observedAttributes() { return ["checked", "disabled", "aria-label"]; }
   connectedCallback() {
     if (!this.button) {
       this.button = this.querySelector("button") ?? document.createElement("button");
@@ -35,6 +37,7 @@ export class GrSwitch extends ElementBase {
   sync() {
     if (!this.button) return;
     this.button.setAttribute("aria-checked", String(this.checked));
+    this.button.setAttribute("aria-label", this.getAttribute("aria-label") || "Toggle");
     this.button.disabled = this.hasAttribute("disabled");
   }
 }
@@ -89,7 +92,9 @@ export class GrDialog extends ElementBase {
     this.dialog = this.querySelector("dialog");
     if (!this.dialog) return;
     this._click = event => {
-      if (event.target.closest("[data-gr-close]") || event.target === this.dialog) this.close();
+      const rect = this.dialog.getBoundingClientRect();
+      const outside = event.target === this.dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom);
+      if (event.target.closest("[data-gr-close]") || outside) this.close();
     };
     this._closed = () => {
       this._previousFocus?.focus?.({ preventScroll: true });
@@ -117,11 +122,13 @@ export class GrDropdown extends ElementBase {
     this.menu = this.querySelector('[role="menu"]');
     if (!this.trigger || !this.menu) return;
     this.trigger.setAttribute("aria-haspopup", "menu");
+    this.menu.id ||= nextId("gr-menu");
+    this.trigger.setAttribute("aria-controls", this.menu.id);
     this._toggle = () => this.menu.hidden ? this.open() : this.close();
     this._outside = event => { if (!this.contains(event.target)) this.close(); };
     this._keys = event => {
       if (this.menu.hidden) {
-        if (event.target === this.trigger && ["ArrowDown", "Enter", " "].includes(event.key)) {
+        if (event.target === this.trigger && ["ArrowDown", "ArrowUp"].includes(event.key)) {
           event.preventDefault(); this.open();
         }
         return;
@@ -135,6 +142,10 @@ export class GrDropdown extends ElementBase {
       } else if (event.key === "Home") { event.preventDefault(); items[0]?.focus(); }
       else if (event.key === "End") { event.preventDefault(); items[items.length - 1]?.focus(); }
       else if (event.key === "Tab") this.close();
+      else if (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        const item = items.find(option => option.textContent.trim().toLowerCase().startsWith(event.key.toLowerCase()));
+        if (item) { event.preventDefault(); item.focus(); }
+      }
     };
     this._select = event => {
       const item = event.target.closest('[role="menuitem"]');
@@ -159,6 +170,14 @@ export class GrDropdown extends ElementBase {
     if (!this.menu) return;
     this.menu.hidden = false;
     this.trigger.setAttribute("aria-expanded", "true");
+    this.menu.style.transform = "";
+    const rect = this.menu.getBoundingClientRect();
+    const shift = Math.min(0, window.innerWidth - rect.right - 8) + Math.max(0, 8 - rect.left);
+    if (shift) this.menu.style.transform = `translateX(${shift}px)`;
+    if (rect.bottom > window.innerHeight - 8 && rect.top > rect.height + 8) {
+      this.menu.style.top = "auto";
+      this.menu.style.bottom = "calc(100% + 6px)";
+    } else { this.menu.style.top = ""; this.menu.style.bottom = ""; }
     document.addEventListener("pointerdown", this._outside, true);
     this.items[0]?.focus();
   }
@@ -167,7 +186,7 @@ export class GrDropdown extends ElementBase {
     this.menu.hidden = true;
     this.trigger.setAttribute("aria-expanded", "false");
     document.removeEventListener("pointerdown", this._outside, true);
-    if (refocus) this.trigger.focus();
+    if (refocus && this.trigger.isConnected) this.trigger.focus();
   }
 }
 
@@ -176,26 +195,83 @@ export class GrToastStack extends ElementBase {
     this.setAttribute("aria-live", "polite");
     this.setAttribute("aria-atomic", "false");
   }
+
+  /**
+   * Toasts enter/leave with interruptible CSS transitions.
+   * Pausing on hover/focus prevents a notification from disappearing while read.
+   */
   push(message, options = {}) {
     const { tone = "neutral", duration = 4200 } = options;
     const toast = document.createElement("div");
     toast.className = "gr-toast";
     toast.dataset.tone = tone;
+    toast.dataset.state = "entering";
     toast.setAttribute("role", tone === "danger" ? "alert" : "status");
+
     const dot = document.createElement("span");
     dot.className = "gr-toast__dot";
     dot.setAttribute("aria-hidden", "true");
     const label = document.createElement("span");
+    label.className = "gr-toast__message";
     label.textContent = String(message);
     const close = document.createElement("button");
     close.type = "button";
     close.setAttribute("aria-label", "Dismiss notification");
     close.textContent = "×";
-    close.addEventListener("click", () => toast.remove(), { once: true });
     toast.append(dot, label, close);
+
+    const motionOff = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let timer;
+    let exitFallback;
+    let remaining = Math.max(0, Number(duration) || 0);
+    let startedAt = 0;
+    let leaving = false;
+    let pausedByPointer = false;
+
+    const finish = () => {
+      clearTimeout(timer);
+      clearTimeout(exitFallback);
+      toast.remove();
+    };
+    const dismiss = () => {
+      if (leaving || !toast.isConnected) return;
+      leaving = true;
+      clearTimeout(timer);
+      if (motionOff) { finish(); return; }
+      toast.dataset.state = "leaving";
+      // The fallback covers display changes or transition suppression by the host.
+      exitFallback = setTimeout(finish, 260);
+    };
+    const pause = () => {
+      if (leaving || !timer) return;
+      clearTimeout(timer);
+      timer = undefined;
+      remaining = Math.max(0, remaining - (performance.now() - startedAt));
+    };
+    const resume = () => {
+      if (leaving || timer || remaining <= 0 || pausedByPointer || toast.contains(document.activeElement)) return;
+      startedAt = performance.now();
+      timer = setTimeout(dismiss, remaining);
+    };
+
+    toast.addEventListener("transitionend", event => {
+      if (leaving && event.target === toast && event.propertyName === "opacity") finish();
+    });
+    toast.addEventListener("pointerenter", () => { pausedByPointer = true; pause(); });
+    toast.addEventListener("pointerleave", () => { pausedByPointer = false; resume(); });
+    toast.addEventListener("focusin", pause);
+    toast.addEventListener("focusout", () => queueMicrotask(resume));
+    close.addEventListener("click", dismiss);
+
     this.append(toast);
     while (this.children.length > 4) this.firstElementChild.remove();
-    if (duration > 0) setTimeout(() => toast.remove(), duration);
+
+    if (motionOff) toast.dataset.state = "visible";
+    else requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (toast.isConnected && !leaving) toast.dataset.state = "visible";
+    }));
+
+    if (remaining > 0) resume();
     return toast;
   }
 }
@@ -206,53 +282,87 @@ export class GrCommandPalette extends ElementBase {
     this.input = this.querySelector('input[type="search"]');
     this.list = this.querySelector(".gr-command-list");
     if (!this.dialog || !this.input || !this.list) return;
+
+    this.list.id ||= nextId("gr-command-list");
+    this.list.setAttribute("role", "listbox");
+    this.list.setAttribute("aria-label", "Commands");
+    this.input.setAttribute("role", "combobox");
+    this.input.setAttribute("aria-autocomplete", "list");
+    this.input.setAttribute("aria-controls", this.list.id);
+    this.input.setAttribute("aria-expanded", "false");
     this.commands = Array.from(this.list.querySelectorAll("[data-gr-command]"));
+    for (const command of this.commands) {
+      command.id ||= nextId("gr-command");
+      command.setAttribute("role", "option");
+      command.tabIndex = -1; // Keyboard focus stays in the combobox.
+    }
+
+    this.empty = document.createElement("p");
+    this.empty.className = "gr-command-empty";
+    this.empty.textContent = "No matching commands";
+    this.empty.hidden = true;
+    this.empty.setAttribute("role", "status");
+    this.list.append(this.empty);
+
     this._filter = () => {
       const query = this.input.value.trim().toLocaleLowerCase();
       for (const entry of this.commands) {
         entry.hidden = !entry.textContent.toLocaleLowerCase().includes(query);
       }
+      this.empty.hidden = this.visible.length !== 0;
       this.mark(this.visible[0]);
     };
     this._keys = event => {
+      if (event.target !== this.input) return;
       const choices = this.visible;
       const i = choices.findIndex(item => item.getAttribute("aria-selected") === "true");
-      if (["ArrowDown", "ArrowUp"].includes(event.key)) {
+      if (["ArrowDown", "ArrowUp"].includes(event.key) && choices.length) {
         event.preventDefault();
         this.mark(choices[(i + (event.key === "ArrowDown" ? 1 : -1) + choices.length) % choices.length]);
-      } else if (event.key === "Enter" && event.target === this.input && choices.length) {
+      } else if (event.key === "Enter" && choices.length) {
         event.preventDefault();
         this.choose(choices[Math.max(0, i)]);
       }
     };
     this._select = event => {
       const button = event.target.closest("[data-gr-command]");
-      if (button) this.choose(button);
+      if (button && !button.hidden) this.choose(button);
     };
+    this._dialogClick = event => {
+      const rect = this.dialog.getBoundingClientRect();
+      if (event.target === this.dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) this.close();
+    };
+    this._closed = () => this.input.setAttribute("aria-expanded", "false");
+
     this.input.addEventListener("input", this._filter);
     this.dialog.addEventListener("keydown", this._keys);
     this.list.addEventListener("click", this._select);
-    this._dialogClick = event => { if (event.target === this.dialog) this.close(); };
     this.dialog.addEventListener("click", this._dialogClick);
+    this.dialog.addEventListener("close", this._closed);
   }
   disconnectedCallback() {
     this.input?.removeEventListener("input", this._filter);
     this.dialog?.removeEventListener("keydown", this._keys);
     this.list?.removeEventListener("click", this._select);
     this.dialog?.removeEventListener("click", this._dialogClick);
+    this.dialog?.removeEventListener("close", this._closed);
   }
   get visible() { return (this.commands || []).filter(entry => !entry.hidden); }
   mark(item) {
     for (const entry of this.commands || []) entry.setAttribute("aria-selected", String(entry === item));
+    if (item) this.input.setAttribute("aria-activedescendant", item.id);
+    else this.input.removeAttribute("aria-activedescendant");
   }
   choose(button) {
     if (!button) return;
-    emit(this, "gr-command", { command: button.dataset.grCommand || button.textContent.trim() });
-    this.close();
+    const command = button.dataset.grCommand || button.textContent.trim();
+    this.close(); // Restore the modal stack before command handlers open another dialog.
+    emit(this, "gr-command", { command });
   }
   open() {
     if (!this.dialog || this.dialog.open) return;
     this.dialog.showModal();
+    this.input.setAttribute("aria-expanded", "true");
     this.input.value = "";
     this._filter();
     this.input.focus();

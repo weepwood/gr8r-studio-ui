@@ -5,11 +5,12 @@ import { GrCommandPalette, GrSwitch } from "../src/index.js";
 
 const load = path => readFile(new URL(path, import.meta.url), "utf8");
 function token(block, name) {
-  const match = block.match(new RegExp(name + ":\\s*(#[0-9a-fA-F]{6})"));
+  const match = block.match(new RegExp(name + ":\\s*(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?)"));
   assert.ok(match, "Missing color token " + name);
   return match[1];
 }
 function luminance(hex) {
+  if (hex.length === 4) hex = "#" + [...hex.slice(1)].map(x => x + x).join("");
   return [1, 3, 5].reduce((result, pos, i) => {
     const c = parseInt(hex.slice(pos, pos + 2), 16) / 255;
     const linear = c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;

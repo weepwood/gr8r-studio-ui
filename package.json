@@ -1,0 +1,32 @@
+{
+  "name": "@weepwood/gr8r-studio-ui",
+  "version": "0.1.0",
+  "description": "Independent, framework-neutral UI component library inspired by the visual language of Gr8r Studio.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Weepwood",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weepwood/gr8r-studio-ui.git"
+  },
+  "homepage": "https://github.com/weepwood/gr8r-studio-ui",
+  "files": ["src", "README.md", "LICENSE"],
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./styles.css": "./src/index.css"
+  },
+  "types": "./src/index.d.ts",
+  "sideEffects": ["**/*.css"],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test",
+    "check": "npm test && npm run build",
+    "preview": "node scripts/dev.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "keywords": ["ui", "design-system", "web-components", "css", "dashboard", "kanban", "task-management"]
+}

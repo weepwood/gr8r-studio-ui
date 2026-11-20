@@ -8,6 +8,7 @@
   --gr-surface-raised: #f0efeb;
   --gr-line: #e7e5df;
   --gr-line-strong: #d9d6ce;
+  --gr-control-line: #989289; /* 3:1+ input boundary against the light surface */
   --gr-ink: #242320;
   --gr-ink-secondary: #65625c;
   --gr-ink-muted: #74716b;
@@ -58,6 +59,7 @@
   --gr-surface-raised: #32312e;
   --gr-line: #32312e;
   --gr-line-strong: #45443f;
+  --gr-control-line: #929087;
   --gr-ink: #eae8e3;
   --gr-ink-secondary: #b5b1a9;
   --gr-ink-muted: #929087;

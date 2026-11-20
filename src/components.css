@@ -20,7 +20,7 @@
 .gr-hint { font-size: var(--gr-text-sm); color: var(--gr-ink-muted); }
 .gr-error { font-size: var(--gr-text-sm); color: var(--gr-danger); }
 .gr-input, .gr-select, .gr-textarea {
-  display: block; width: 100%; min-height: var(--gr-control-md); border: 1px solid var(--gr-line-strong);
+  display: block; width: 100%; min-height: var(--gr-control-md); border: 1px solid var(--gr-control-line);
   border-radius: var(--gr-radius-sm); padding: 7px 10px; background: var(--gr-surface);
   font-size: var(--gr-text-md); transition: box-shadow var(--gr-motion), border-color var(--gr-motion);
 }
@@ -30,7 +30,7 @@
 .gr-input:disabled, .gr-select:disabled { background: var(--gr-surface-muted); }
 .gr-select { padding-right: 30px; cursor: pointer; }
 .gr-textarea { min-height: 78px; resize: vertical; }
-.gr-search { display: flex; align-items: center; gap: 8px; padding: 0 10px; min-height: var(--gr-control-md); background: var(--gr-surface); border: 1px solid var(--gr-line-strong); border-radius: var(--gr-radius-sm); }
+.gr-search { display: flex; align-items: center; gap: 8px; padding: 0 10px; min-height: var(--gr-control-md); background: var(--gr-surface); border: 1px solid var(--gr-control-line); border-radius: var(--gr-radius-sm); }
 .gr-search:focus-within { border-color: var(--gr-accent); box-shadow: 0 0 0 3px var(--gr-accent-wash); }
 .gr-search > svg { color: var(--gr-ink-muted); width: 15px; height: 15px; }
 .gr-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; }
@@ -190,3 +190,12 @@
 .gr-button--ghost[aria-pressed="true"] { background: var(--gr-accent-wash); color: var(--gr-accent); }
 .gr-command-empty { margin: 0; padding: 20px 12px; color: var(--gr-ink-secondary); font-size: var(--gr-text-sm); text-align: center; }
 .gr-command-empty[hidden] { display: none; }
+
+/* A larger invisible click target preserves the original compact switch track. */
+.gr-switch-button { position: relative; width: 44px; height: 36px; padding: 0; background: transparent; }
+.gr-switch-button::before { content: ""; position: absolute; inset: 8px 6px 9px; background: var(--gr-line-strong); border-radius: 999px; transition: background var(--gr-motion); }
+.gr-switch-button::after { position: absolute; inset-inline-start: 8px; top: 10px; }
+.gr-switch-button[aria-checked="true"] { background: transparent; }
+.gr-switch-button[aria-checked="true"]::before { background: var(--gr-accent); }
+.gr-switch-button[aria-checked="true"]::after { transform: translateX(13px); }
+@media (prefers-reduced-motion: reduce) { .gr-switch-button::before, .gr-switch-button::after { transition: none; } }

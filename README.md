@@ -89,6 +89,20 @@ Vue 3 可将 `tag.startsWith("gr-")` 设为 `compilerOptions.isCustomElement`，
 
 `main` 分支推送后，GitHub Actions 会尝试测试、构建和部署静态页面。若首次使用，请在仓库 **Settings → Pages → Build and deployment → GitHub Actions** 选择部署源。站点预期地址：https://weepwood.github.io/gr8r-studio-ui/ 。工作流文件已提交不代表页面已经上线，应以 Actions / Pages 的实际结果为准。
 
+## 交互与视觉优化（v0.2.0）
+
+本轮按 [Jakub Krehel 的 better-ui / better-accessibility / better-colors / better-layout / better-motion](https://github.com/jakubkrehel/skills) 与 [Emil Kowalski 的 animate / animation-performance / review-animations](https://github.com/emilkowalski/skills) 的检查原则进行优化：
+
+- 为部分语义文字、错误色、警告色、输入边界补足对比度；
+- 鼠标悬停只在支持 hover 的设备上生效，触屏输入避免 iOS 焦点缩放；
+- 优化对话框、菜单、命令面板的交互与辅助技术语义；
+- Toast 改用可中断的 opacity / transform 过渡，悬停或聚焦时暂停自动关闭；
+- 移动端侧栏增加遮罩、焦点限制与 Escape 返回；
+- 修复任务筛选后图标消失，补上真实视图切换示例；
+- 高频命令面板和列表不加入多余的入场/逐项动画，且支持 reduced motion。
+
+以上是根据 Skill 原则完成的**代码改动**，不是对两套 Skill 的再发布。参见 [设计审查记录](docs/skill-guided-review.md)。
+
 ## 授权与来源
 
 本仓库独立编写的代码采用 [MIT](LICENSE) 许可证。原始 [Gr8r Studio](https://github.com/gr8rstudio/gr8r-studio) 的源码、商标和资产不属于本库的 MIT 授权范围。详细说明参见 [docs/attribution.md](docs/attribution.md)。

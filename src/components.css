@@ -185,3 +185,8 @@
  .gr-toast { transform: none !important; transition-property: opacity; }
  .gr-progress > span, .gr-tab-list [role="tab"] { transition: none; }
 }
+
+/* Pressed filter state is communicated visually as well as through aria-pressed. */
+.gr-button--ghost[aria-pressed="true"] { background: var(--gr-accent-wash); color: var(--gr-accent); }
+.gr-command-empty { margin: 0; padding: 20px 12px; color: var(--gr-ink-secondary); font-size: var(--gr-text-sm); text-align: center; }
+.gr-command-empty[hidden] { display: none; }

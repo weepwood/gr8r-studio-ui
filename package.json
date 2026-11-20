@@ -1,6 +1,6 @@
 {
   "name": "@weepwood/gr8r-studio-ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Independent, framework-neutral UI component library inspired by the visual language of Gr8r Studio.",
   "type": "module",
   "license": "MIT",

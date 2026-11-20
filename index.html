@@ -36,7 +36,7 @@
   <div class="gr-app-shell" id="app-shell">
     <aside class="gr-sidebar" id="sidebar" aria-label="组件导航">
       <div class="gr-sidebar__brand"><span class="demo-mark">g<span>.</span></span><span>gr8r <span class="demo-brand-dim">/ ui</span></span></div>
-      <div class="demo-side-intro">COMPONENT LIBRARY <span class="gr-badge">v0.1.0</span></div>
+      <div class="demo-side-intro">COMPONENT LIBRARY <span class="gr-badge">v0.2.0</span></div>
       <nav aria-label="主导航">
         <div class="gr-sidebar__section">
           <div class="gr-sidebar__heading">Getting started</div>
@@ -62,6 +62,7 @@
         <div class="gr-row"><span class="gr-avatar gr-avatar--lavender">WW</span><span class="gr-grow"><strong class="demo-side-user">Weepwood</strong><small class="demo-side-sub">Design playground</small></span><span class="gr-faint">⌘</span></div>
       </div>
     </aside>
+    <button class="gr-nav-scrim" id="nav-scrim" type="button" aria-label="关闭侧边导航" tabindex="-1" hidden></button>
     <main class="gr-main" id="main-content">
       <header class="gr-topbar">
         <button class="gr-icon-button demo-mobile-toggle" id="mobile-nav" type="button" aria-label="打开侧边导航" aria-controls="sidebar" aria-expanded="false"><svg><use href="#ic-menu"/></svg></button>
@@ -90,7 +91,7 @@
             <article class="gr-card demo-stat"><div class="gr-row"><span class="gr-muted">Team activity</span><span class="gr-badge gr-badge--good">On track</span></div><strong>86<span class="demo-stat-unit">%</span></strong><div class="gr-row"><div class="gr-avatar-stack"><span class="gr-avatar gr-avatar--peach">AL</span><span class="gr-avatar gr-avatar--sage">JW</span><span class="gr-avatar gr-avatar--lavender">MK</span><span class="gr-avatar gr-avatar--sky">+3</span></div><span class="gr-faint">6 members</span></div></article>
           </div>
           <div class="gr-card demo-task-card">
-            <div class="gr-card__header"><div class="gr-row"><span class="demo-section-pin"></span><strong class="gr-card__title">Upcoming tasks</strong><span class="gr-badge">4</span></div><button class="gr-button gr-button--ghost gr-button--sm" id="tasks-filter" type="button"><svg><use href="#ic-filter"/></svg>Incomplete only</button></div>
+            <div class="gr-card__header"><div class="gr-row"><span class="demo-section-pin"></span><strong class="gr-card__title">Upcoming tasks</strong><span class="gr-badge" id="task-count" aria-live="polite" aria-atomic="true">4</span></div><button class="gr-button gr-button--ghost gr-button--sm" id="tasks-filter" type="button" aria-pressed="false"><svg><use href="#ic-filter"/></svg><span class="demo-filter-label">Incomplete only</span></button></div>
             <div class="gr-task-row"><input type="checkbox" class="gr-checkbox demo-task-checkbox" aria-label="完成：Review typography scale" /><span class="gr-task-row__title">Review typography scale</span><span class="gr-tag gr-tag--violet">Design</span><span class="gr-task-row__meta">DES-102 <span class="gr-avatar gr-avatar--peach">AL</span></span></div>
             <div class="gr-task-row"><input type="checkbox" class="gr-checkbox demo-task-checkbox" aria-label="完成：Build reusable dropdown" /><span class="gr-task-row__title">Build reusable dropdown</span><span class="gr-tag gr-tag--blue">Frontend</span><span class="gr-task-row__meta">DEV-084 <span class="gr-avatar gr-avatar--sage">JW</span></span></div>
             <div class="gr-task-row"><input type="checkbox" class="gr-checkbox demo-task-checkbox" checked aria-label="完成：Define spacing tokens" /><span class="gr-task-row__title demo-task-done">Define spacing tokens</span><span class="gr-badge gr-badge--good"><span class="gr-badge__dot"></span>Done</span><span class="gr-task-row__meta">DES-094 <span class="gr-avatar gr-avatar--lavender">MK</span></span></div>
@@ -156,7 +157,23 @@
               <section role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" tabindex="0" class="demo-tab-panel" hidden><strong>Project settings</strong><p>Manage permissions, preferences, and project details.</p></section>
             </gr-tabs>
             <div class="demo-card-caption demo-top-border">Segmented switch <span>Stateful example</span></div>
-            <div class="gr-segmented" id="view-segments" role="group" aria-label="View type"><button type="button" aria-pressed="true">List</button><button type="button" aria-pressed="false">Board</button><button type="button" aria-pressed="false">Calendar</button></div>
+            <div class="gr-segmented" id="view-segments" role="group" aria-label="View type">
+              <button type="button" data-view="list" aria-controls="view-preview-list" aria-pressed="true">List</button>
+              <button type="button" data-view="board" aria-controls="view-preview-board" aria-pressed="false">Board</button>
+              <button type="button" data-view="calendar" aria-controls="view-preview-calendar" aria-pressed="false">Calendar</button>
+            </div>
+            <div class="demo-view-panel" id="view-preview-list" role="region" aria-label="List view preview">
+              <strong>List · Prioritized work</strong><p>Keep tasks readable with compact rows, clear status, and consistent secondary metadata.</p>
+              <div class="demo-view-preview"><span>● Review tokens</span><span>● Ship dropdown</span><span>● QA keyboard</span></div>
+            </div>
+            <div class="demo-view-panel" id="view-preview-board" role="region" aria-label="Board view preview" hidden>
+              <strong>Board · See the flow</strong><p>Move between stages without losing task ownership or priority at a glance.</p>
+              <div class="demo-view-preview"><span>To do · 4</span><span>In progress · 2</span><span>Done · 8</span></div>
+            </div>
+            <div class="demo-view-panel" id="view-preview-calendar" role="region" aria-label="Calendar view preview" hidden>
+              <strong>Calendar · Plan by date</strong><p>A date-first view for scheduling deadlines and milestones.</p>
+              <div class="demo-view-preview"><span>Mon · Review</span><span>Wed · Release</span><span>Fri · QA</span></div>
+            </div>
           </div>
         </section>
 

@@ -4,6 +4,7 @@ import { extname, resolve, sep } from "node:path";
 
 const base = resolve(process.cwd());
 const port = Number(process.env.PORT || 5173);
+const host = process.env.HOST || "0.0.0.0";
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -18,6 +19,9 @@ createServer(async (request, response) => {
   }
   try {
     const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
+    if (pathname.split("/").some(part => part.startsWith("."))) {
+      response.writeHead(403); response.end("Forbidden"); return;
+    }
     const initial = resolve(base, "." + pathname);
     if (initial !== base && !initial.startsWith(base + sep)) {
       response.writeHead(403); response.end("Forbidden"); return;
@@ -33,6 +37,6 @@ createServer(async (request, response) => {
     response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
     response.end("Not found");
   }
-}).listen(port, "127.0.0.1", () => {
+}).listen(port, host, () => {
   process.stdout.write("Gr8r UI gallery: http://127.0.0.1:" + port + "\n");
 });

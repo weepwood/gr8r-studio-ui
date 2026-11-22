@@ -15,9 +15,11 @@ export function applyGr8rPreferences(target, options = {}) {
     density: ["comfortable", "compact"]
   };
   const mapping = { theme: "data-gr-theme", accent: "data-gr-accent", density: "data-gr-density" };
-  for (const [key, value] of Object.entries(options)) {
-    if (!(key in valid) || !valid[key].includes(value)) throw new RangeError("Unsupported preference: " + key + "=" + value);
-    target.setAttribute(mapping[key], value);
+  // Validate the entire update before mutating the DOM (no partial theme changes).
+  const entries = Object.entries(options);
+  for (const [key, value] of entries) {
+    if (!Object.hasOwn(valid, key) || !valid[key].includes(value)) throw new RangeError("Unsupported preference: " + key + "=" + value);
   }
+  for (const [key, value] of entries) target.setAttribute(mapping[key], value);
   return target;
 }

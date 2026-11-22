@@ -24,6 +24,7 @@
 .gr-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
 .gr-grid--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 1050px) { .gr-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 800px) { .gr-grid, .gr-grid--two { grid-template-columns: 1fr; } }
 @media (max-width: 760px) {
   .gr-app-shell { grid-template-columns: minmax(0, 1fr); }
   .gr-sidebar { position: fixed; z-index: 40; top: 0; bottom: 0; left: 0; width: 255px; transform: translateX(-105%); transition: transform var(--gr-motion); box-shadow: var(--gr-float-shadow); }

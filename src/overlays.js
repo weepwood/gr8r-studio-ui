@@ -162,7 +162,8 @@ export class GrPopover extends ElementBase {
     if (multiple) option.setAttribute("aria-selected", String(option.getAttribute("aria-selected") !== "true"));
     else for (const item of this.listbox.querySelectorAll('[role="option"]')) item.setAttribute("aria-selected", String(item === option));
     const value = option.dataset.value ?? option.textContent.trim();
-    const allowed = emit(this, "gr-select", { value, label: option.textContent.trim(), selected: option.getAttribute("aria-selected") === "true" });
+    const label = option.getAttribute("aria-label") || option.textContent.trim();
+    const allowed = emit(this, "gr-select", { value, label, selected: option.getAttribute("aria-selected") === "true" });
     if (allowed && !multiple && !this.hasAttribute("keep-open")) this.close(true);
   }
 }

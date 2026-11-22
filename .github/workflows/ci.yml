@@ -12,47 +12,83 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    outputs:
+      pages-artifact-name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+      pages-artifact-id: ${{ steps.pages-artifact.outputs.artifact_id }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
+          cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm test
       - run: npm run build
       - run: npm run test:e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: browser-test-results
+          name: browser-test-results-${{ github.run_attempt }}
           path: test-results/
       - name: Confirm static files exist
-        run: test -s dist/index.html && test -s dist/src/index.css && test -s dist/demo/demo.js
-      - uses: actions/upload-artifact@v4
+        run: test -s dist/index.html && test -s dist/src/index.css && test -s dist/demo/demo.js && test -s dist/demo/state.js
+      # Package once in the producer job. Retrying only deployment must not
+      # upload another artifact with the same name in this workflow run.
+      - name: Upload Pages artifact
+        id: pages-artifact
+        uses: actions/upload-pages-artifact@v5
         with:
-          name: site
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: dist/
+          retention-days: 7
+
+  artifact-check:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Wait for the uploaded Pages artifact
+        uses: actions/github-script@v9
+        env:
+          PAGES_ARTIFACT_NAME: ${{ needs.verify.outputs.pages-artifact-name }}
+          PAGES_ARTIFACT_ID: ${{ needs.verify.outputs.pages-artifact-id }}
+        with:
+          script: |
+            const { pathToFileURL } = require('node:url');
+            const moduleUrl = pathToFileURL(`${process.env.GITHUB_WORKSPACE}/scripts/pages-artifact.mjs`);
+            const { waitForPagesArtifact } = await import(moduleUrl.href);
+            await waitForPagesArtifact({
+              artifactName: process.env.PAGES_ARTIFACT_NAME,
+              artifactId: process.env.PAGES_ARTIFACT_ID,
+              listArtifacts: () => github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+                ...context.repo,
+                run_id: context.runId,
+                per_page: 100
+              }),
+              log: message => core.info(message)
+            });
 
   pages:
-    if: github.event_name != 'pull_request'
-    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [verify, artifact-check]
     runs-on: ubuntu-latest
     permissions:
       pages: write
       id-token: write
       contents: read
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: site
-          path: dist/
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/
+      - uses: actions/configure-pages@v6
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: ${{ needs.verify.outputs.pages-artifact-name }}

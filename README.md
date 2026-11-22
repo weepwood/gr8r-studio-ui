@@ -104,6 +104,8 @@ Vue 3 可将 `tag.startsWith("gr-")` 设为 `compilerOptions.isCustomElement`，
 
 `main` 分支推送后，GitHub Actions 会尝试测试、构建和部署静态页面。若首次使用，请在仓库 **Settings → Pages → Build and deployment → GitHub Actions** 选择部署源。站点预期地址：https://weepwood.github.io/gr8r-studio-ui/ 。工作流文件已提交不代表页面已经上线，应以 Actions / Pages 的实际结果为准。
 
+构建任务只上传一次带运行 / 尝试编号的 Pages 制品，发布任务使用其确切名称和 ID 进行校验，避免重跑时固定名称冲突。仅 `main` 的非 PR 运行可发布，生产部署串行执行。构建成功、仅部署失败时可重跑失败任务；制品已过期或构建失败时应重跑完整工作流。详细过程和故障记录见 [Pages 部署与排查](docs/pages-deployment.md)。
+
 ## 交互与视觉优化（v0.2.0）
 
 本轮按 [Jakub Krehel 的 better-ui / better-accessibility / better-colors / better-layout / better-motion](https://github.com/jakubkrehel/skills) 与 [Emil Kowalski 的 animate / animation-performance / review-animations](https://github.com/emilkowalski/skills) 的检查原则进行优化：

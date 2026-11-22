@@ -15,8 +15,10 @@
 - **基础控件**：Button、IconButton、Input、Search、Textarea、Select、Checkbox、Radio、Card、Badge、Tag、Avatar、Progress、Skeleton、Empty。
 - **工作台结构**：Sidebar、Topbar、AppShell、Tabs、Segmented、TaskRow、Table、Kanban。
 - **带交互的原生组件**：Switch、Tabs、Dialog、Dropdown、ToastStack、CommandPalette。
-- **示例**：组件展示站、可切换主题、任务新增和筛选、命令面板、弹窗及通知。
-- **质量**：TypeScript 类型声明、Node 内置测试、GitHub Actions 构建 / Pages 部署配置。
+- **示例**：响应式组件展示站、可记忆的外观设置、任务搜索 / 排序 / 新增 / 详情 / 删除撤销、命令面板、弹窗及通知。
+- **质量**：TypeScript 类型声明、Node 内置测试、Playwright 浏览器回归、GitHub Actions 构建 / Pages 部署配置。
+
+本轮改进与后续优先级见 [UI / UX 优化评审](docs/ui-ux-improvement-review.md)。
 
 ## 本地启动
 
@@ -29,6 +31,17 @@ npm run dev        # http://127.0.0.1:5173
 npm test
 npm run build      # 静态站点输出到 dist/
 ~~~
+
+浏览器回归为可选的开发检查（不会引入运行时依赖）：
+
+~~~bash
+npm ci
+npx playwright install --with-deps chromium
+npm run test:e2e
+npm run check:all  # Node 测试 + 构建 + 浏览器测试
+~~~
+
+开发服务器默认绑定 `0.0.0.0:5173`，便于代理预览；可用 `HOST` / `PORT` 覆盖。请勿将开发文件服务直接作为生产服务公开。
 
 ## 使用
 
@@ -84,6 +97,8 @@ Vue 3 可将 `tag.startsWith("gr-")` 设为 `compilerOptions.isCustomElement`，
 ## 可访问性与功能边界
 
 组件支持常见语义结构、焦点样式、键盘事件以及 `prefers-reduced-motion`，但不宣称已通过完整 WCAG 或浏览器矩阵认证。Kanban、Table、TaskRow 是**呈现组件**，并不包含原应用的协作服务、数据库、持久化或拖拽引擎。
+
+展示站的任务示例使用本地存储（键 `gr8r-gallery:v1`，最多 200 条任务），刷新后保留任务和明确选择的外观偏好；浏览器禁用存储时降级为仅本次访问。任务内容不会上传，且不会跨设备同步；删除撤销入口不等于回收站，刷新或通知被关闭后不可恢复。该行为只属于 `demo/`，不会强加给组件库消费者。上方统计卡片为标注的示例数据，未与任务列表关联。
 
 ## 部署
 

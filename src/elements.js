@@ -44,15 +44,15 @@ export class GrSwitch extends ElementBase {
 
 export class GrTabs extends ElementBase {
   connectedCallback() {
-    this.tabs = Array.from(this.querySelectorAll('[role="tab"]'));
-    this.panels = Array.from(this.querySelectorAll('[role="tabpanel"]'));
+    this.tabs = Array.from(this.querySelectorAll('[role="tab"]')).filter(tab => tab.closest("gr-tabs") === this);
+    this.panels = Array.from(this.querySelectorAll('[role="tabpanel"]')).filter(panel => panel.closest("gr-tabs") === this);
     this._click = event => {
       const tab = event.target.closest('[role="tab"]');
-      if (tab && this.contains(tab) && !tab.disabled) this.activate(tab, true);
+      if (tab && this.tabs.includes(tab) && !tab.disabled) this.activate(tab, true);
     };
     this._keys = event => {
       const current = event.target.closest('[role="tab"]');
-      if (!current || !this.contains(current)) return;
+      if (!current || !this.tabs.includes(current)) return;
       const enabled = this.tabs.filter(tab => !tab.disabled);
       const i = enabled.indexOf(current);
       let next = i;
@@ -97,7 +97,7 @@ export class GrDialog extends ElementBase {
       if (event.target.closest("[data-gr-close]") || outside) this.close();
     };
     this._closed = () => {
-      this._previousFocus?.focus?.({ preventScroll: true });
+      if (!document.querySelector("dialog[open]")) this._previousFocus?.focus?.({ preventScroll: true });
       emit(this, "gr-close", {});
     };
     this.dialog.addEventListener("click", this._click);
@@ -124,12 +124,13 @@ export class GrDropdown extends ElementBase {
     this.trigger.setAttribute("aria-haspopup", "menu");
     this.menu.id ||= nextId("gr-menu");
     this.trigger.setAttribute("aria-controls", this.menu.id);
-    this._toggle = () => this.menu.hidden ? this.open() : this.close();
+    this._toggle = () => this.menu.hidden ? this.open() : this.close(true);
     this._outside = event => { if (!this.contains(event.target)) this.close(); };
     this._keys = event => {
       if (this.menu.hidden) {
         if (event.target === this.trigger && ["ArrowDown", "ArrowUp"].includes(event.key)) {
           event.preventDefault(); this.open();
+          if (event.key === "ArrowUp") this.items.at(-1)?.focus();
         }
         return;
       }
@@ -149,7 +150,7 @@ export class GrDropdown extends ElementBase {
     };
     this._select = event => {
       const item = event.target.closest('[role="menuitem"]');
-      if (item && !item.disabled) {
+      if (item && !item.disabled && item.getAttribute("aria-disabled") !== "true") {
         emit(this, "gr-select", { value: item.dataset.value || item.textContent.trim() });
         this.close(true);
       }
@@ -165,12 +166,14 @@ export class GrDropdown extends ElementBase {
     this.menu?.removeEventListener("click", this._select);
     document.removeEventListener("pointerdown", this._outside, true);
   }
-  get items() { return Array.from(this.menu?.querySelectorAll('[role="menuitem"]:not(:disabled)') || []); }
+  get items() { return Array.from(this.menu?.querySelectorAll('[role="menuitem"]:not(:disabled):not([aria-disabled="true"])') || []); }
   open() {
-    if (!this.menu) return;
+    if (!this.menu || this.trigger.disabled || this.trigger.getAttribute("aria-disabled") === "true") return;
     this.menu.hidden = false;
     this.trigger.setAttribute("aria-expanded", "true");
     this.menu.style.transform = "";
+    this.menu.style.top = "";
+    this.menu.style.bottom = "";
     const rect = this.menu.getBoundingClientRect();
     const shift = Math.min(0, window.innerWidth - rect.right - 8) + Math.max(0, 8 - rect.left);
     if (shift) this.menu.style.transform = `translateX(${shift}px)`;
@@ -297,7 +300,8 @@ export class GrCommandPalette extends ElementBase {
       command.tabIndex = -1; // Keyboard focus stays in the combobox.
     }
 
-    this.empty = document.createElement("p");
+    this.empty = this.querySelector("[data-gr-command-empty]") || document.createElement("p");
+    this.empty.setAttribute("data-gr-command-empty", "");
     this.empty.className = "gr-command-empty";
     this.empty.textContent = "No matching commands";
     this.empty.hidden = true;
@@ -332,7 +336,7 @@ export class GrCommandPalette extends ElementBase {
       const rect = this.dialog.getBoundingClientRect();
       if (event.target === this.dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) this.close();
     };
-    this._closed = () => this.input.setAttribute("aria-expanded", "false");
+    this._closed = () => this.input.setAttribute("aria-expanded", String(this.dialog.open));
 
     this.input.addEventListener("input", this._filter);
     this.dialog.addEventListener("keydown", this._keys);
@@ -350,7 +354,10 @@ export class GrCommandPalette extends ElementBase {
   get visible() { return (this.commands || []).filter(entry => !entry.hidden); }
   mark(item) {
     for (const entry of this.commands || []) entry.setAttribute("aria-selected", String(entry === item));
-    if (item) this.input.setAttribute("aria-activedescendant", item.id);
+    if (item) {
+      this.input.setAttribute("aria-activedescendant", item.id);
+      if (this.dialog?.open) item.scrollIntoView?.({ block: "nearest" });
+    }
     else this.input.removeAttribute("aria-activedescendant");
   }
   choose(button) {

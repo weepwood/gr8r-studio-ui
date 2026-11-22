@@ -18,6 +18,7 @@
   --gr-good: #226c4f;
   --gr-caution: #886111;
   --gr-danger: #b63e38;
+  --gr-danger-contrast: #fff;
   --gr-info: #286f9e;
   --gr-violet: #6e4eaa;
   --gr-shadow: 0 1px 3px rgb(27 26 24 / 4%), 0 0 0 1px var(--gr-line);
@@ -68,6 +69,7 @@
   --gr-good: #76c3a0;
   --gr-caution: #e6b65b;
   --gr-danger: #ec928c;
+  --gr-danger-contrast: #351917;
   --gr-info: #88bbdf;
   --gr-violet: #b99bdf;
   --gr-shadow: 0 1px 5px rgb(0 0 0 / 18%), 0 0 0 1px var(--gr-line);

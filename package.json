@@ -10,7 +10,11 @@
     "url": "git+https://github.com/weepwood/gr8r-studio-ui.git"
   },
   "homepage": "https://github.com/weepwood/gr8r-studio-ui",
-  "files": ["src", "README.md", "LICENSE"],
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
@@ -19,14 +23,31 @@
     "./styles.css": "./src/index.css"
   },
   "types": "./src/index.d.ts",
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
-    "test": "node --test",
+    "test": "node --test test/*.test.mjs",
     "check": "npm test && npm run build",
-    "preview": "node scripts/dev.mjs"
+    "preview": "node scripts/dev.mjs",
+    "test:e2e": "playwright test",
+    "check:all": "npm run check && npm run test:e2e"
   },
-  "engines": { "node": ">=20" },
-  "keywords": ["ui", "design-system", "web-components", "css", "dashboard", "kanban", "task-management"]
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "ui",
+    "design-system",
+    "web-components",
+    "css",
+    "dashboard",
+    "kanban",
+    "task-management"
+  ],
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  }
 }

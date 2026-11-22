@@ -10,7 +10,29 @@
   <link rel="stylesheet" href="./demo/demo.css" />
   <script type="module" src="./demo/demo.js"></script>
 </head>
-<body class="gr-ui" data-gr-theme="light" data-gr-accent="indigo" data-gr-density="comfortable">
+<body class="gr-ui" data-gr-theme="system" data-gr-accent="indigo" data-gr-density="comfortable" data-gr-motion="full">
+  <script>
+    /* Apply saved appearance before first paint (no light/dark flash). Gallery-only. */
+    (function () {
+      try {
+        var saved = {};
+        try { saved = JSON.parse(localStorage.getItem("gr8r-gallery:v1") || "{}").preferences || {}; } catch (error) { /* storage blocked */ }
+        var allowed = { theme: ["light", "dark", "system"], accent: ["indigo", "teal", "rose", "graphite"], density: ["comfortable", "compact"], motion: ["full", "reduce"] };
+        for (var key in allowed) {
+          if (allowed[key].indexOf(saved[key]) !== -1) document.body.setAttribute("data-gr-" + key, saved[key]);
+        }
+        var languages = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+        var locale = saved.locale === "en" || saved.locale === "zh-CN" ? saved.locale : (/^zh\b/i.test(languages[0] || "") ? "zh-CN" : "en");
+        if (locale === "zh-CN") {
+          var html = document.documentElement;
+          html.lang = "zh-CN";
+          // Hide the English source text until demo.js translates it; never longer than 1.5 s.
+          html.classList.add("demo-i18n-pending");
+          setTimeout(function () { html.classList.remove("demo-i18n-pending"); }, 1500);
+        }
+      } catch (error) { /* keep defaults */ }
+    })();
+  </script>
   <a class="demo-skip-link" href="#overview">Skip to content</a>
   <svg class="demo-svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <symbol id="ic-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
@@ -26,6 +48,7 @@
     <symbol id="ic-check" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></symbol>
     <symbol id="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.4 1.4m11.34 11.34 1.4 1.4M2 12h2m16 0h2M4.93 19.07l1.4-1.4M17.67 6.33l1.4-1.4"/></symbol>
     <symbol id="ic-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></symbol>
+    <symbol id="ic-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
     <symbol id="ic-filter" viewBox="0 0 24 24"><path d="M3 6h18M7 12h10M10 18h4"/></symbol>
     <symbol id="ic-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
     <symbol id="ic-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol>
@@ -34,24 +57,36 @@
     <symbol id="ic-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
     <symbol id="ic-trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></symbol>
     <symbol id="ic-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+    <symbol id="ic-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5h.01"/></symbol>
+    <symbol id="ic-triangle" viewBox="0 0 24 24"><path d="M10.3 4.2 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0ZM12 9v4M12 16.5h.01"/></symbol>
+    <symbol id="ic-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="ic-wifi-off" viewBox="0 0 24 24"><path d="M2 2l20 20M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.8M19 12.9a10 10 0 0 0-2.1-1.6M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 11 5M12 20h.01"/></symbol>
+    <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="ic-sparkle" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></symbol>
+    <symbol id="ic-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+    <symbol id="ic-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+    <symbol id="ic-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
   </svg>
   <div class="gr-app-shell" id="app-shell">
     <aside class="gr-sidebar" id="sidebar" aria-label="Component navigation">
       <div class="gr-sidebar__brand"><span class="demo-mark">g<span>.</span></span><span>gr8r <span class="demo-brand-dim">/ ui</span></span></div>
-      <div class="demo-side-intro">COMPONENT LIBRARY <span class="gr-badge">v0.2.0</span></div>
+      <div class="demo-side-intro">COMPONENT LIBRARY <span class="gr-badge">v0.4.0</span></div>
       <nav aria-label="Main navigation">
         <div class="gr-sidebar__section">
           <div class="gr-sidebar__heading">Getting started</div>
           <a class="gr-sidebar__link" href="#overview" aria-current="page"><svg><use href="#ic-grid"/></svg>Overview</a>
           <a class="gr-sidebar__link" href="#install"><svg><use href="#ic-box"/></svg>Installation<span class="demo-nav-new">Start</span></a>
           <a class="gr-sidebar__link" href="#foundations"><svg><use href="#ic-palette"/></svg>Foundations</a>
+          <a class="gr-sidebar__link" href="#motion"><svg><use href="#ic-sparkle"/></svg>Motion<span class="demo-nav-new">New</span></a>
         </div>
         <div class="gr-sidebar__section">
           <div class="gr-sidebar__heading">Components</div>
           <a class="gr-sidebar__link" href="#buttons"><svg><use href="#ic-sliders"/></svg>Buttons & actions</a>
           <a class="gr-sidebar__link" href="#forms"><svg><use href="#ic-box"/></svg>Form controls</a>
+          <a class="gr-sidebar__link" href="#pickers"><svg><use href="#ic-calendar"/></svg>Pickers & popovers<span class="demo-nav-new">New</span></a>
           <a class="gr-sidebar__link" href="#navigation"><svg><use href="#ic-layers"/></svg>Navigation</a>
           <a class="gr-sidebar__link" href="#data"><svg><use href="#ic-list"/></svg>Data display</a>
+          <a class="gr-sidebar__link" href="#status"><svg><use href="#ic-check-circle"/></svg>Status & priority<span class="demo-nav-new">New</span></a>
           <a class="gr-sidebar__link" href="#patterns"><svg><use href="#ic-grid"/></svg>Task patterns</a>
           <a class="gr-sidebar__link" href="#overlays"><svg><use href="#ic-box"/></svg>Overlays & feedback</a>
         </div>
@@ -63,7 +98,7 @@
       </nav>
       <div class="demo-sidebar-tip"><span class="demo-eyebrow">LESS NOISE. MORE FOCUS.</span><p>Small details.<br />Better everyday work.</p><a href="#install">Build something great <span aria-hidden="true">↗</span></a></div>
       <div class="gr-sidebar__footer">
-        <div class="gr-row"><span class="gr-avatar gr-avatar--lavender">WW</span><span class="gr-grow"><strong class="demo-side-user">Weepwood</strong><small class="demo-side-sub">Design playground</small></span><span class="gr-faint">⌘</span></div>
+        <div class="gr-row"><span class="gr-avatar gr-avatar--lavender" data-presence="online">WW</span><span class="gr-grow"><strong class="demo-side-user">Weepwood</strong><small class="demo-side-sub">Design playground</small></span><span class="gr-faint">⌘</span></div>
       </div>
     </aside>
     <button class="gr-nav-scrim" id="nav-scrim" type="button" aria-label="Close navigation" tabindex="-1" hidden></button>
@@ -73,6 +108,7 @@
         <span class="gr-topbar__breadcrumb">Workspace <span class="demo-crumb-slash">/</span> <strong id="current-section">Overview</strong></span>
         <div class="gr-grow"></div>
         <button class="gr-button gr-button--secondary gr-button--sm demo-search-shortcut" id="open-command" aria-label="Search components and commands" type="button"><svg><use href="#ic-search"/></svg><span>Quick search</span><span class="gr-kbd">⌘ K</span></button>
+        <button class="gr-icon-button gr-tooltip demo-lang-toggle" id="toggle-language" type="button" data-gr-tooltip="Switch language" aria-label="切换到简体中文 (Switch to Chinese)" lang="zh-CN" data-i18n-skip><span>中</span></button>
         <button class="gr-icon-button gr-tooltip" id="toggle-theme" type="button" data-gr-tooltip="Toggle theme" aria-label="Switch to dark theme"><svg><use href="#ic-moon"/></svg></button>
         <a class="gr-icon-button gr-tooltip demo-header-github" data-gr-tooltip="GitHub" aria-label="Repository" href="https://github.com/weepwood/gr8r-studio-ui"><svg><use href="#ic-arrow"/></svg></a>
         <span class="gr-avatar gr-avatar--sage" aria-label="Workspace demo">DS</span>
@@ -80,14 +116,14 @@
       <div class="gr-page">
         <section id="overview" class="demo-hero" tabindex="-1" aria-labelledby="hero-title">
           <div class="demo-hero-copy">
-            <a class="demo-release" href="#install"><span class="demo-release-dot"></span> GR8R STUDIO UI <span>v0.2.0 <span aria-hidden="true">↗</span></span></a>
-            <h1 id="hero-title" class="gr-page-title">Designed for focus<span class="demo-period">.</span><br /><span class="demo-hero-soft">Built for your flow.</span></h1>
-            <p class="gr-page-description">A quiet collection of interfaces for getting work done. Thoughtful defaults. Small details. Space for what matters.</p>
-            <div class="demo-hero-actions">
+            <a class="demo-release gr-fx-rise" href="#motion"><span class="demo-release-dot"></span> GR8R STUDIO UI <span data-i18n-skip>v0.4.0 · 中文 / English <span aria-hidden="true">↗</span></span></a>
+            <h1 id="hero-title" class="gr-page-title gr-fx-rise" style="--gr-stagger: 1">Designed for focus<span class="demo-period">.</span><br /><span class="demo-hero-soft">Built for your flow.</span></h1>
+            <p class="gr-page-description gr-fx-rise" style="--gr-stagger: 2">A quiet collection of interfaces for getting work done. Thoughtful defaults. Small details. Space for what matters.</p>
+            <div class="demo-hero-actions gr-fx-rise" style="--gr-stagger: 3">
               <a class="gr-button gr-button--primary gr-button--lg" href="#buttons">Explore components <svg><use href="#ic-arrow"/></svg></a>
               <a class="gr-button gr-button--secondary gr-button--lg" href="#install"><svg><use href="#ic-box"/></svg>Get started</a>
             </div>
-            <div class="demo-hero-facts"><span><svg><use href="#ic-check"/></svg>Zero runtime dependencies</span><span><svg><use href="#ic-check"/></svg>Framework neutral</span></div>
+            <div class="demo-hero-facts gr-fx-rise" style="--gr-stagger: 4"><span><svg><use href="#ic-check"/></svg>Zero runtime dependencies</span><span><svg><use href="#ic-check"/></svg>Framework neutral</span><span><svg><use href="#ic-check"/></svg>12 Web Components</span></div>
           </div>
           <div class="demo-hero-art" aria-label="Component composition preview">
             <div class="demo-art-grid" aria-hidden="true"></div>
@@ -101,13 +137,13 @@
             <span class="demo-art-caption">INTENTION IN EVERY INTERACTION</span>
           </div>
         </section>
-        <div class="demo-system-strip" aria-label="Library highlights"><span><svg><use href="#ic-box"/></svg>Native by nature</span><span>CSS + Web Components</span><span>Light & dark</span><a href="#foundations">Make it yours <span aria-hidden="true">↗</span></a></div>
+        <div class="demo-system-strip" aria-label="Library highlights"><span><svg><use href="#ic-box"/></svg>Native by nature</span><span>CSS + Web Components</span><span>Light, dark &amp; system</span><a href="#foundations">Make it yours <span aria-hidden="true">↗</span></a></div>
 
         <section class="gr-section demo-preview" aria-label="Workspace preview">
           <div class="demo-preview-head"><div><span class="demo-eyebrow">LIVE PREVIEW</span><h2>Workspace overview</h2><p>One visual language, from quick actions to complex data.</p></div><span class="gr-badge gr-badge--accent"><span class="gr-badge__dot"></span>Interactive playground</span></div>
-          <p class="demo-sample-note">Sample workspace metrics · task list below is fully interactive</p>
+          <p class="demo-sample-note">Sample workspace metrics · task list below is fully interactive (right-click a task for more)</p>
           <div class="gr-grid demo-stat-grid">
-            <article class="gr-card demo-stat"><div class="gr-row"><span class="gr-muted">Active projects</span><span class="demo-stat-icon" aria-hidden="true"><svg><use href="#ic-arrow"/></svg></span></div><strong>08 <span class="demo-stat-trend">+2 this month</span></strong><div class="gr-progress"><span style="--gr-value:68%"></span></div></article>
+            <article class="gr-card demo-stat"><div class="gr-row"><span class="gr-muted">Active projects</span><span class="demo-stat-icon" aria-hidden="true"><svg><use href="#ic-arrow"/></svg></span></div><strong>08 <span class="demo-stat-trend">+2 this month</span></strong><div class="gr-progress gr-progress--animate"><span style="--gr-value:68%"></span></div></article>
             <article class="gr-card demo-stat"><div class="gr-row"><span class="gr-muted">Tasks completed</span><span class="demo-stat-icon" aria-hidden="true"><svg><use href="#ic-arrow"/></svg></span></div><strong>128 <span class="demo-stat-trend">+14.2%</span></strong><div class="demo-spark"><i style="height:35%"></i><i style="height:42%"></i><i style="height:30%"></i><i style="height:62%"></i><i style="height:48%"></i><i style="height:76%"></i><i style="height:94%"></i></div></article>
             <article class="gr-card demo-stat"><div class="gr-row"><span class="gr-muted">Team activity</span><span class="gr-badge gr-badge--good">On track</span></div><strong>86<span class="demo-stat-unit">%</span></strong><div class="gr-row"><div class="gr-avatar-stack"><span class="gr-avatar gr-avatar--peach">AL</span><span class="gr-avatar gr-avatar--sage">JW</span><span class="gr-avatar gr-avatar--lavender">MK</span><span class="gr-avatar gr-avatar--sky">+3</span></div><span class="gr-faint">6 members</span></div></article>
           </div>
@@ -118,17 +154,26 @@
               <label class="demo-task-sort"><span class="gr-visually-hidden">Sort tasks</span><select id="task-sort" class="gr-select" aria-label="Sort tasks"><option value="default">Original order</option><option value="priority">Priority first</option><option value="title">Title A–Z</option></select></label>
               <button class="gr-button gr-button--primary gr-button--sm" type="button" data-open-dialog><svg><use href="#ic-plus"/></svg>Add task</button>
             </div>
-            <div id="task-rows"></div>
+            <gr-context-menu id="task-context">
+              <div id="task-rows" data-gr-context-target></div>
+              <div class="gr-menu" role="menu" aria-label="Task actions" hidden>
+                <button type="button" role="menuitem" data-value="details">Open details</button>
+                <button type="button" role="menuitem" data-value="toggle">Toggle complete</button>
+                <button type="button" role="menuitem" data-value="duplicate">Duplicate</button>
+                <div class="gr-menu__divider"></div>
+                <button type="button" role="menuitem" data-value="delete" class="demo-menu-danger">Delete task</button>
+              </div>
+            </gr-context-menu>
             <noscript><p class="gr-empty">Enable JavaScript to use the task playground. The component gallery below is still available.</p></noscript>
             <div class="gr-empty" id="task-empty" hidden><span class="demo-empty-illustration"><svg><use href="#ic-search"/></svg></span><strong id="task-empty-title">No matching tasks</strong><span id="task-empty-description">Try a different search or clear your filters.</span><button type="button" class="gr-button gr-button--secondary gr-button--sm" id="clear-task-filters">Clear filters</button></div>
-            <div class="demo-task-footer"><span id="task-summary" role="status"></span><div class="gr-progress" id="task-progress" role="progressbar" aria-label="Tasks completed" aria-valuemin="0" aria-valuemax="100"><span></span></div><span class="demo-save-status" id="save-status"><svg><use href="#ic-check"/></svg>Saved on this device</span></div>
+            <div class="demo-task-footer"><span id="task-summary" role="status"></span><div class="gr-progress" id="task-progress" role="progressbar" aria-label="Tasks completed" aria-valuemin="0" aria-valuemax="100"><span></span></div><button type="button" class="gr-link demo-reset-link" id="reset-playground">Reset sample data</button><span class="demo-save-status" id="save-status"><svg><use href="#ic-check"/></svg>Saved on this device</span></div>
           </div>
         </section>
 
         <section class="gr-section" id="foundations">
           <div class="gr-section__header"><h2>01 / Foundations</h2><p>Themeable color, readable type, considered rhythm.</p></div>
           <div class="gr-card demo-foundations-card">
-            <div class="demo-card-caption">Semantic palette <span>14+ tokens · light and dark</span></div>
+            <div class="demo-card-caption">Semantic palette <span>20+ tokens · light, dark and system</span></div>
             <div class="demo-swatches">
               <div class="demo-swatch"><i style="--swatch:var(--gr-canvas)"></i><b>Canvas</b><code>--gr-canvas</code></div>
               <div class="demo-swatch"><i style="--swatch:var(--gr-sidebar)"></i><b>Sidebar</b><code>--gr-sidebar</code></div>
@@ -139,38 +184,176 @@
               <div class="demo-swatch"><i style="--swatch:var(--gr-good)"></i><b>Success</b><code>--gr-good</code></div>
               <div class="demo-swatch"><i style="--swatch:var(--gr-danger)"></i><b>Danger</b><code>--gr-danger</code></div>
             </div>
+            <div class="demo-card-caption demo-top-border">Elevation &amp; radius <span>Cards rest flat; only moving things cast shadows</span></div>
+            <div class="demo-elevation">
+              <div><i style="box-shadow:var(--gr-shadow-card)"></i><code>--gr-shadow-card</code></div>
+              <div><i style="box-shadow:var(--gr-shadow-hover)"></i><code>--gr-shadow-hover</code></div>
+              <div><i style="box-shadow:var(--gr-float-shadow)"></i><code>--gr-float-shadow</code></div>
+              <div><i style="box-shadow:var(--gr-shadow-drag)"></i><code>--gr-shadow-drag</code></div>
+              <div><i class="demo-radius" style="border-radius:var(--gr-radius-sm)"></i><code>--gr-radius-sm · 6</code></div>
+              <div><i class="demo-radius" style="border-radius:var(--gr-radius-lg)"></i><code>--gr-radius-lg · 13</code></div>
+            </div>
             <div class="demo-card-caption demo-top-border">Appearance <span>Try the same components with different preferences</span></div>
             <div class="demo-preferences">
-              <div class="gr-field"><span class="gr-label">Theme</span><div class="gr-segmented" aria-label="Theme"><button type="button" data-theme="light" aria-pressed="true"><svg><use href="#ic-sun"/></svg>Light</button><button type="button" data-theme="dark" aria-pressed="false"><svg><use href="#ic-moon"/></svg>Dark</button></div></div>
+              <div class="gr-field"><span class="gr-label">Theme</span><div class="gr-segmented" aria-label="Theme" role="group"><button type="button" data-theme="light" aria-pressed="false"><svg><use href="#ic-sun"/></svg>Light</button><button type="button" data-theme="dark" aria-pressed="false"><svg><use href="#ic-moon"/></svg>Dark</button><button type="button" data-theme="system" aria-pressed="true"><svg><use href="#ic-monitor"/></svg>System</button></div></div>
               <div class="gr-field"><span class="gr-label">Accent</span><div class="demo-accent-list" role="group" aria-label="Accent color"><button data-accent="indigo" aria-label="Indigo" aria-pressed="true"></button><button data-accent="teal" aria-label="Teal" aria-pressed="false"></button><button data-accent="rose" aria-label="Rose" aria-pressed="false"></button><button data-accent="graphite" aria-label="Graphite" aria-pressed="false"></button></div></div>
               <div class="gr-field"><label class="gr-label" for="density">Density</label><select class="gr-select" id="density"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></div>
+              <div class="gr-field"><span class="gr-label">Language</span><div class="gr-segmented" aria-label="Language" role="group"><button type="button" data-locale="en" lang="en" aria-pressed="true" data-i18n-skip>English</button><button type="button" data-locale="zh-CN" lang="zh-CN" aria-pressed="false" data-i18n-skip>简体中文</button></div></div>
+              <div class="gr-field"><span class="gr-label" id="motion-label">Reduce motion</span><div class="demo-motion-pref"><gr-switch id="motion-switch" aria-label="Reduce motion"></gr-switch><span class="gr-faint" id="motion-hint">Follows your system setting too</span></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="gr-section" id="motion">
+          <div class="gr-section__header"><h2>02 / Motion</h2><p>Quick, purposeful, interruptible — and always optional.</p></div>
+          <div class="gr-grid gr-grid--two">
+            <div class="gr-card demo-component-card">
+              <div class="demo-card-caption">Easing &amp; duration <button class="gr-button gr-button--secondary gr-button--sm" type="button" id="motion-play" aria-pressed="false">Play</button></div>
+              <div class="demo-curves" id="motion-curves">
+                <div class="demo-curve" style="--demo-ease: var(--gr-ease-out); --demo-duration: var(--gr-duration-fast)"><span><b>Fast</b><code>120ms · ease-out</code></span><div class="demo-track"><i></i></div><small>Hover, press, toggles</small></div>
+                <div class="demo-curve" style="--demo-ease: var(--gr-ease-out); --demo-duration: var(--gr-duration-base)"><span><b>Base</b><code>200ms · ease-out</code></span><div class="demo-track"><i></i></div><small>Menus, popovers, tabs</small></div>
+                <div class="demo-curve" style="--demo-ease: var(--gr-ease-in-out); --demo-duration: var(--gr-duration-slow)"><span><b>Panel</b><code>320ms · in-out</code></span><div class="demo-track"><i></i></div><small>Drawers, sheets</small></div>
+                <div class="demo-curve" style="--demo-ease: var(--gr-ease-spring); --demo-duration: var(--gr-duration-slow)"><span><b>Spring</b><code>320ms · spring</code></span><div class="demo-track"><i></i></div><small>Checks, drops, confirmations</small></div>
+              </div>
+              <p class="demo-component-note">Tokens: <code>--gr-ease-out</code>, <code>--gr-ease-in-out</code>, <code>--gr-ease-spring</code>, <code>--gr-duration-fast | base | slow</code>.</p>
+            </div>
+            <div class="gr-card demo-component-card" data-demo-code>
+              <div class="demo-card-caption">State effects <span>One-shot classes from motion.css</span></div>
+              <div class="demo-fx-stage" id="fx-stage">
+                <div class="gr-task-row demo-fx-row" id="fx-row"><input class="gr-checkbox" type="checkbox" id="fx-check" aria-label="Polish onboarding copy" /><span class="gr-task-row__title">Polish onboarding copy</span><span class="gr-tag gr-tag--violet">Design</span></div>
+                <label class="gr-field"><span class="gr-label">Email</span><input class="gr-input" id="fx-input" type="email" value="alex@" /></label>
+              </div>
+              <div class="demo-control-row demo-fx-buttons" data-demo-keep>
+                <button type="button" class="gr-button gr-button--secondary gr-button--sm" data-fx="added">Added</button>
+                <button type="button" class="gr-button gr-button--secondary gr-button--sm" data-fx="done">Completed</button>
+                <button type="button" class="gr-button gr-button--secondary gr-button--sm" data-fx="shake">Invalid</button>
+                <button type="button" class="gr-button gr-button--secondary gr-button--sm" data-fx="leave">Removed</button>
+                <button type="button" class="gr-button gr-button--secondary gr-button--sm" data-fx="rise">Enter</button>
+              </div>
+              <p class="demo-component-note">One-shot classes: <code>.gr-fx-added</code> <code>.gr-fx-done</code> <code>.gr-fx-land</code> <code>.gr-fx-shake</code> <code>.gr-fx-leave</code> <code>.gr-fx-rise</code> · helper: <code>playEffect(element, className)</code></p>
             </div>
           </div>
         </section>
 
         <section class="gr-section" id="buttons">
-          <div class="gr-section__header"><h2>02 / Buttons & actions</h2><p>Purposeful emphasis, consistent states.</p></div>
+          <div class="gr-section__header"><h2>03 / Buttons & actions</h2><p>Purposeful emphasis, consistent states.</p></div>
           <div class="gr-grid gr-grid--two">
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Variants <span>4 styles</span></div><div class="demo-control-row"><button class="gr-button gr-button--primary" data-toast="Primary action"><svg><use href="#ic-plus"/></svg>Primary</button><button class="gr-button gr-button--secondary" data-toast="Secondary action">Secondary</button><button class="gr-button gr-button--ghost" data-toast="Ghost action">Ghost</button><button class="gr-button gr-button--danger" data-toast="Destructive action">Delete</button></div><p class="demo-component-note">Use a single primary action per decision area.</p></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Sizes & states</div><div class="demo-control-row"><button class="gr-button gr-button--secondary gr-button--sm" data-toast="Small button · 28px">Small</button><button class="gr-button gr-button--secondary" data-toast="Medium button · 34px">Medium</button><button class="gr-button gr-button--secondary gr-button--lg" data-toast="Large button · 40px">Large</button><button class="gr-button gr-button--secondary" disabled>Disabled</button><button class="gr-button gr-button--primary" aria-busy="true" disabled>Loading</button></div><p class="demo-component-note">Controls align on a compact height scale.</p></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Icon buttons</div><div class="demo-control-row"><button class="gr-icon-button gr-tooltip" data-gr-tooltip="Search" aria-label="Search" data-command><svg><use href="#ic-search"/></svg></button><button class="gr-icon-button gr-tooltip" data-gr-tooltip="Add task" aria-label="Add task" data-open-dialog><svg><use href="#ic-plus"/></svg></button><button class="gr-icon-button gr-tooltip" data-gr-tooltip="Filter" aria-label="Filter" data-toast="Filter clicked"><svg><use href="#ic-filter"/></svg></button><button class="gr-icon-button gr-tooltip" data-gr-tooltip="More" aria-label="More options" data-toast="More options"><svg><use href="#ic-more"/></svg></button><button class="gr-icon-button" aria-label="Disabled action" disabled><svg><use href="#ic-more"/></svg></button></div></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Keyboard shortcuts</div><div class="demo-control-row"><span class="gr-kbd">⌘</span><span class="gr-kbd">K</span><span class="gr-faint">Search commands</span><span class="gr-kbd">Esc</span><span class="gr-faint">Dismiss overlays</span></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Variants <span>4 styles</span></div><div class="demo-control-row"><button class="gr-button gr-button--primary" data-toast="Primary action"><svg><use href="#ic-plus"/></svg>Primary</button><button class="gr-button gr-button--secondary" data-toast="Secondary action">Secondary</button><button class="gr-button gr-button--ghost" data-toast="Ghost action">Ghost</button><button class="gr-button gr-button--danger" data-toast="Destructive action">Delete</button></div><p class="demo-component-note">Use a single primary action per decision area.</p></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Sizes & states</div><div class="demo-control-row"><button class="gr-button gr-button--secondary gr-button--sm" data-toast="Small button · 28px">Small</button><button class="gr-button gr-button--secondary" data-toast="Medium button · 34px">Medium</button><button class="gr-button gr-button--secondary gr-button--lg" data-toast="Large button · 40px">Large</button><button class="gr-button gr-button--secondary" disabled>Disabled</button><button class="gr-button gr-button--primary" aria-busy="true" disabled>Loading</button></div><p class="demo-component-note">Controls align on a compact height scale.</p></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Icon buttons</div><div class="demo-control-row"><button class="gr-icon-button gr-tooltip" data-gr-tooltip="Search" aria-label="Search" data-command><svg><use href="#ic-search"/></svg></button><button class="gr-icon-button gr-tooltip" data-gr-tooltip="Add task" aria-label="Add task" data-open-dialog><svg><use href="#ic-plus"/></svg></button><button class="gr-icon-button gr-tooltip" data-gr-tooltip="Filter" aria-label="Filter" data-toast="Filter clicked"><svg><use href="#ic-filter"/></svg></button><button class="gr-icon-button gr-tooltip" data-gr-tooltip="More" aria-label="More options" data-toast="More options"><svg><use href="#ic-more"/></svg></button><button class="gr-icon-button" aria-label="Disabled action" disabled><svg><use href="#ic-more"/></svg></button></div><p class="demo-component-note">Tooltips wait for intent (~0.3 s) before fading in.</p></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Keyboard shortcuts</div><div class="demo-control-row"><span class="gr-kbd">⌘</span><span class="gr-kbd">K</span><span class="gr-faint">Search commands</span><span class="gr-kbd">Esc</span><span class="gr-faint">Dismiss overlays</span><span class="gr-kbd">⇧ F10</span><span class="gr-faint">Context menu</span></div></div>
           </div>
         </section>
 
         <section class="gr-section" id="forms">
-          <div class="gr-section__header"><h2>03 / Form controls</h2><p>Accessible native inputs with calm visual treatment.</p></div>
+          <div class="gr-section__header"><h2>04 / Form controls</h2><p>Accessible native inputs with calm visual treatment.</p></div>
           <div class="gr-grid gr-grid--two">
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Text inputs</div><div class="gr-stack"><label class="gr-field"><span class="gr-label">Project name</span><input class="gr-input" placeholder="e.g. Website redesign" /></label><label class="gr-field"><span class="gr-label">Email (error)</span><input class="gr-input" type="email" value="alex@" aria-invalid="true" aria-describedby="email-error"/><span class="gr-error" id="email-error">Enter a valid email address</span></label><label class="gr-field"><span class="gr-label">Search</span><span class="gr-search"><svg><use href="#ic-search"/></svg><input type="search" placeholder="Find projects..." /></span></label></div></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Selection & editing</div><div class="gr-stack"><label class="gr-field"><span class="gr-label">Status</span><select class="gr-select"><option>In progress</option><option>Planned</option><option>In review</option><option>Completed</option></select></label><label class="gr-field"><span class="gr-label">Description</span><textarea class="gr-textarea" placeholder="Add a brief description..."></textarea></label><label class="gr-field"><span class="gr-label">Due date</span><input class="gr-input" type="date" /></label></div></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Checkboxes & radio</div><div class="demo-choice-list"><label class="gr-checkline"><input class="gr-checkbox" type="checkbox" checked/>Send task notifications</label><label class="gr-checkline"><input class="gr-checkbox" type="checkbox"/>Include archived projects</label><div class="gr-divider"></div><label class="gr-checkline"><input class="gr-radio" type="radio" name="frequency" checked/>Every day</label><label class="gr-checkline"><input class="gr-radio" type="radio" name="frequency"/>Every week</label></div></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Switches</div><div class="demo-setting-row"><div><b>Desktop notifications</b><p class="gr-faint">Alerts for tasks assigned to you</p></div><gr-switch aria-label="Desktop notifications" checked></gr-switch></div><div class="demo-setting-row"><div><b>Automatic updates</b><p class="gr-faint">Keep workspace views fresh</p></div><gr-switch aria-label="Automatic updates"></gr-switch></div><div class="demo-setting-row"><div><b>Disabled option</b><p class="gr-faint">Unavailable in this demo</p></div><gr-switch aria-label="Disabled option" disabled></gr-switch></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Text inputs</div><div class="gr-stack"><label class="gr-field"><span class="gr-label">Project name</span><input class="gr-input" placeholder="e.g. Website redesign" /></label><label class="gr-field"><span class="gr-label">Email (error)</span><input class="gr-input" type="email" value="alex@" aria-invalid="true" aria-describedby="email-error"/><span class="gr-error" id="email-error">Enter a valid email address</span></label><label class="gr-field"><span class="gr-label">Search</span><span class="gr-search"><svg><use href="#ic-search"/></svg><input type="search" placeholder="Find projects..." /></span></label></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Selection & editing</div><div class="gr-stack"><label class="gr-field"><span class="gr-label">Status</span><select class="gr-select"><option value="progress">In progress</option><option value="planned">Planned</option><option value="review">In review</option><option value="done">Completed</option></select></label><label class="gr-field"><span class="gr-label">Description</span><textarea class="gr-textarea" placeholder="Add a brief description..."></textarea></label><label class="gr-field"><span class="gr-label">Due date</span><input class="gr-input" type="date" /></label></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Checkboxes & radio</div><div class="demo-choice-list"><label class="gr-checkline"><input class="gr-checkbox" type="checkbox" checked/>Send task notifications</label><label class="gr-checkline"><input class="gr-checkbox" type="checkbox"/>Include archived projects</label><div class="gr-divider"></div><label class="gr-checkline"><input class="gr-radio" type="radio" name="frequency" checked/>Every day</label><label class="gr-checkline"><input class="gr-radio" type="radio" name="frequency"/>Every week</label></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Switches</div><div class="demo-setting-row"><div><b>Desktop notifications</b><p class="gr-faint">Alerts for tasks assigned to you</p></div><gr-switch aria-label="Desktop notifications" checked></gr-switch></div><div class="demo-setting-row"><div><b>Automatic updates</b><p class="gr-faint">Keep workspace views fresh</p></div><gr-switch aria-label="Automatic updates"></gr-switch></div><div class="demo-setting-row"><div><b>Disabled option</b><p class="gr-faint">Unavailable in this demo</p></div><gr-switch aria-label="Disabled option" disabled></gr-switch></div></div>
+          </div>
+        </section>
+
+        <section class="gr-section" id="pickers">
+          <div class="gr-section__header"><h2>05 / Pickers & popovers</h2><p>Anchored, keyboard-first property editors from the task workspace.</p></div>
+          <div class="gr-grid gr-grid--two">
+            <div class="gr-card demo-component-card" data-demo-code>
+              <div class="demo-card-caption">Property pickers <span>Click, or focus and press ↓</span></div>
+              <dl class="gr-props demo-picker-props">
+                <dt>Status</dt>
+                <dd>
+                  <gr-popover data-demo-picker="status">
+                    <button type="button" class="gr-picker" data-gr-trigger aria-label="Status: In progress"><span class="gr-status" data-status="progress" data-picker-icon></span><span data-picker-label>In progress</span></button>
+                    <div class="gr-popover" data-gr-panel hidden>
+                      <div role="listbox" aria-label="Status">
+                        <button type="button" role="option" data-value="backlog"><span class="gr-status" data-status="backlog"></span>Backlog</button>
+                        <button type="button" role="option" data-value="todo"><span class="gr-status" data-status="todo"></span>To do</button>
+                        <button type="button" role="option" data-value="progress" aria-selected="true"><span class="gr-status" data-status="progress"></span>In progress</button>
+                        <button type="button" role="option" data-value="review"><span class="gr-status" data-status="review"></span>Review</button>
+                        <button type="button" role="option" data-value="done"><span class="gr-status" data-status="done"></span>Done</button>
+                      </div>
+                    </div>
+                  </gr-popover>
+                </dd>
+                <dt>Priority</dt>
+                <dd>
+                  <gr-popover data-demo-picker="priority">
+                    <button type="button" class="gr-picker" data-gr-trigger aria-label="Priority: High"><span class="gr-priority" data-level="high" data-picker-icon aria-hidden="true"><i></i><i></i><i></i></span><span data-picker-label>High</span></button>
+                    <div class="gr-popover" data-gr-panel hidden>
+                      <div role="listbox" aria-label="Priority">
+                        <button type="button" role="option" data-value="urgent"><span class="gr-priority" data-level="urgent" aria-hidden="true"><i></i><i></i><i></i></span>Urgent</button>
+                        <button type="button" role="option" data-value="high" aria-selected="true"><span class="gr-priority" data-level="high" aria-hidden="true"><i></i><i></i><i></i></span>High</button>
+                        <button type="button" role="option" data-value="medium"><span class="gr-priority" data-level="medium" aria-hidden="true"><i></i><i></i><i></i></span>Medium</button>
+                        <button type="button" role="option" data-value="low"><span class="gr-priority" data-level="low" aria-hidden="true"><i></i><i></i><i></i></span>Low</button>
+                        <button type="button" role="option" data-value="none"><span class="gr-priority" data-level="none" aria-hidden="true"><i></i><i></i><i></i></span>No priority</button>
+                      </div>
+                    </div>
+                  </gr-popover>
+                </dd>
+                <dt>Assignee</dt>
+                <dd>
+                  <gr-popover data-demo-picker="assignee">
+                    <button type="button" class="gr-picker" data-gr-trigger aria-label="Assignee: Jordan Wells"><span class="gr-avatar gr-avatar--xs gr-avatar--sage" data-picker-icon>JW</span><span data-picker-label>Jordan Wells</span></button>
+                    <div class="gr-popover" data-gr-panel hidden>
+                      <input class="gr-popover__filter" type="search" data-gr-filter placeholder="Assign to…" aria-label="Filter people" />
+                      <div role="listbox" aria-label="Assignee">
+                        <button type="button" role="option" data-value="AL"><span class="gr-avatar gr-avatar--xs gr-avatar--peach">AL</span>Alex Lin</button>
+                        <button type="button" role="option" data-value="JW" aria-selected="true"><span class="gr-avatar gr-avatar--xs gr-avatar--sage">JW</span>Jordan Wells</button>
+                        <button type="button" role="option" data-value="MK"><span class="gr-avatar gr-avatar--xs gr-avatar--lavender">MK</span>Morgan Kim</button>
+                        <button type="button" role="option" data-value="CN"><span class="gr-avatar gr-avatar--xs gr-avatar--sky">CN</span>Casey Novak</button>
+                      </div>
+                    </div>
+                  </gr-popover>
+                </dd>
+                <dt>Due date</dt>
+                <dd>
+                  <gr-popover data-demo-picker="date">
+                    <button type="button" class="gr-picker" data-gr-trigger aria-label="Due date: Nov 27"><svg><use href="#ic-calendar"/></svg><span data-picker-label>Nov 27</span></button>
+                    <div class="gr-popover gr-popover--padded" data-gr-panel aria-label="Choose a due date" hidden>
+                      <gr-calendar value="2026-11-27"></gr-calendar>
+                    </div>
+                  </gr-popover>
+                </dd>
+              </dl>
+              <p class="demo-component-note">Listbox popovers support ↑ ↓ Home End, type-ahead, Enter and Escape; picks emit <code>gr-select</code></p>
+            </div>
+            <div class="gr-card demo-component-card" data-demo-code>
+              <div class="demo-card-caption">Custom select <span>Native select, enhanced</span></div>
+              <div class="gr-stack">
+                <div class="gr-field"><span class="gr-label" id="project-select-label">Project</span><gr-select><select class="gr-select" name="project" aria-labelledby="project-select-label"><optgroup label="Active"><option value="website" data-gr-color="var(--gr-accent)" selected>Website redesign</option><option value="mobile" data-gr-color="var(--gr-teal)">Mobile app</option><option value="launch" data-gr-color="var(--gr-caution)">Product launch</option></optgroup><optgroup label="Archived"><option value="brand" data-gr-color="var(--gr-ink-muted)">Brand refresh</option><option value="portal" disabled>Customer portal (no access)</option></optgroup></select></gr-select></div>
+                <div class="gr-field"><span class="gr-label" id="view-select-label">Default view</span><gr-select><select class="gr-select" name="view" aria-labelledby="view-select-label"><option value="board">Board</option><option value="list" selected>List</option><option value="table">Table</option><option value="calendar">Calendar</option><option value="timeline">Timeline</option></select></gr-select></div>
+              </div>
+              <p class="demo-component-note" aria-live="polite">Form value: <b id="select-output" data-i18n-skip>project=website · view=list</b></p>
+            </div>
+            <div class="gr-card demo-component-card" data-demo-code>
+              <div class="demo-card-caption">Context menu <span>Right-click, or focus a row + Shift F10</span></div>
+              <gr-context-menu id="file-context">
+                <ul class="demo-file-list" data-gr-context-target aria-label="Project files">
+                  <li data-gr-context-item="Launch brief.pdf" tabindex="0"><span class="demo-file-icon">PDF</span><span class="gr-grow" data-i18n-skip>Launch brief.pdf</span><span class="gr-faint">2.4 MB</span></li>
+                  <li data-gr-context-item="Homepage v3.fig" tabindex="0"><span class="demo-file-icon demo-file-icon--violet">FIG</span><span class="gr-grow" data-i18n-skip>Homepage v3.fig</span><span class="gr-faint">8.1 MB</span></li>
+                  <li data-gr-context-item="Research notes.md" tabindex="0"><span class="demo-file-icon demo-file-icon--teal">MD</span><span class="gr-grow" data-i18n-skip>Research notes.md</span><span class="gr-faint">12 KB</span></li>
+                </ul>
+                <div class="gr-menu" role="menu" aria-label="File actions" hidden>
+                  <button type="button" role="menuitem" data-value="Open">Open</button>
+                  <button type="button" role="menuitem" data-value="Rename">Rename</button>
+                  <button type="button" role="menuitem" data-value="Copy link">Copy link</button>
+                  <div class="gr-menu__divider"></div>
+                  <button type="button" role="menuitem" data-value="Delete" class="demo-menu-danger">Delete</button>
+                </div>
+              </gr-context-menu>
+            </div>
+            <div class="gr-card demo-component-card" data-demo-code>
+              <div class="demo-card-caption">Calendar <span>Arrows · PageUp/PageDown · Enter</span></div>
+              <gr-calendar id="demo-calendar" value="2026-11-25" min="2026-11-02" aria-label="Release date"></gr-calendar>
+              <p class="demo-component-note" aria-live="polite">Release date: <b id="calendar-output">2026-11-25</b> · days before Nov 2 are disabled.</p>
+            </div>
           </div>
         </section>
 
         <section class="gr-section" id="navigation">
-          <div class="gr-section__header"><h2>04 / Navigation</h2><p>Tabs and segmented controls with keyboard support.</p></div>
-          <div class="gr-card demo-component-card">
+          <div class="gr-section__header"><h2>06 / Navigation</h2><p>Tabs, breadcrumbs and segmented controls with keyboard support.</p></div>
+          <div class="gr-card demo-component-card" data-demo-code>
             <div class="demo-card-caption">Accessible tabs <span>← / → to navigate</span></div>
             <gr-tabs>
               <div role="tablist" class="gr-tab-list" aria-label="Project views">
@@ -201,66 +384,134 @@
               <div class="demo-view-preview"><span>Mon · Review</span><span>Wed · Release</span><span>Fri · QA</span></div>
             </div>
           </div>
+          <div class="gr-card demo-component-card demo-stacked-card" data-demo-code>
+            <div class="demo-card-caption">Breadcrumbs <span>Current page is marked with aria-current</span></div>
+            <nav class="gr-breadcrumbs" aria-label="Breadcrumb"><ol><li><button type="button" data-toast="Workspace">Gr8r Studio</button></li><li><button type="button" data-toast="Projects">Projects</button></li><li><span aria-current="page">Website redesign</span></li></ol></nav>
+          </div>
         </section>
 
         <section class="gr-section" id="data">
-          <div class="gr-section__header"><h2>05 / Data display</h2><p>Small pieces that scale to complex applications.</p></div>
+          <div class="gr-section__header"><h2>07 / Data display</h2><p>Small pieces that scale to complex applications.</p></div>
+          <div class="gr-card demo-component-card demo-stacked-card demo-stat-card" data-demo-code>
+            <div class="demo-card-caption">Stat group <span>One strip, hairline dividers</span></div>
+            <div class="gr-stat-group">
+              <div class="gr-stat"><span class="gr-stat__label"><svg><use href="#ic-folder"/></svg>Active projects</span><span class="gr-stat__value">5</span><span class="gr-stat__meta">1 at risk</span></div>
+              <div class="gr-stat"><span class="gr-stat__label"><span class="gr-status" data-status="todo"></span>Open tasks</span><span class="gr-stat__value">39</span><span class="gr-stat__meta">7 assigned to you</span></div>
+              <div class="gr-stat"><span class="gr-stat__label"><span class="gr-status" data-status="done"></span>Completed</span><span class="gr-stat__value">9</span><span class="gr-stat__meta gr-stat__meta--good">this week</span></div>
+              <div class="gr-stat"><span class="gr-stat__label"><svg><use href="#ic-alert"/></svg>Overdue</span><span class="gr-stat__value" style="color:var(--gr-danger)">2</span><span class="gr-stat__meta gr-stat__meta--danger">need attention</span></div>
+            </div>
+          </div>
           <div class="gr-grid gr-grid--two">
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Badges & statuses</div><div class="demo-control-row"><span class="gr-badge">Default</span><span class="gr-badge gr-badge--accent"><span class="gr-badge__dot"></span>Active</span><span class="gr-badge gr-badge--good"><span class="gr-badge__dot"></span>Completed</span><span class="gr-badge gr-badge--warning">Pending</span><span class="gr-badge gr-badge--danger">Blocked</span></div><div class="demo-control-row demo-spaced"><span class="gr-tag">General</span><span class="gr-tag gr-tag--blue">Development</span><span class="gr-tag gr-tag--violet">Design</span><span class="gr-tag gr-tag--green">QA</span></div></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Avatars & progress</div><div class="demo-control-row"><div class="gr-avatar-stack"><span class="gr-avatar gr-avatar--peach">AL</span><span class="gr-avatar gr-avatar--sage">JW</span><span class="gr-avatar gr-avatar--lavender">MK</span><span class="gr-avatar gr-avatar--sky">CN</span></div><span class="gr-faint">4 collaborators</span></div><div class="demo-progress-list"><div class="gr-row"><b>Design system</b><span class="gr-grow"></span><span class="gr-muted">72%</span></div><div class="gr-progress" role="progressbar" aria-label="Design system completion" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"><span style="--gr-value:72%"></span></div></div></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Empty state</div><div class="gr-empty"><span class="demo-empty-illustration"><svg><use href="#ic-box"/></svg></span><strong>Nothing here yet</strong><span>Make your first project to get started.</span><button class="gr-button gr-button--secondary gr-button--sm" data-toast="Create project">Create project</button></div></div>
-            <div class="gr-card demo-component-card"><div class="demo-card-caption">Loading skeletons</div><div class="gr-stack"><span class="gr-skeleton" style="width:38%;height:13px"></span><span class="gr-skeleton" style="width:94%;height:10px"></span><span class="gr-skeleton" style="width:72%;height:10px"></span><div class="gr-row"><span class="gr-skeleton" style="height:28px;width:28px;border-radius:50%"></span><span class="gr-skeleton" style="height:10px;width:40%"></span></div></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Badges & statuses</div><div class="demo-control-row"><span class="gr-badge">Default</span><span class="gr-badge gr-badge--accent"><span class="gr-badge__dot"></span>Active</span><span class="gr-badge gr-badge--good"><span class="gr-badge__dot"></span>Completed</span><span class="gr-badge gr-badge--warning">Pending</span><span class="gr-badge gr-badge--danger">Blocked</span></div><div class="demo-control-row demo-spaced"><span class="gr-tag">General</span><span class="gr-tag gr-tag--blue">Development</span><span class="gr-tag gr-tag--violet">Design</span><span class="gr-tag gr-tag--green">QA</span></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Avatars & progress</div><div class="demo-control-row"><span class="gr-avatar gr-avatar--xs gr-avatar--peach">AL</span><span class="gr-avatar gr-avatar--sm gr-avatar--sage">JW</span><span class="gr-avatar gr-avatar--lavender" data-presence="online">MK</span><span class="gr-avatar gr-avatar--lg gr-avatar--sky" data-presence="busy">CN</span><div class="gr-avatar-stack"><span class="gr-avatar gr-avatar--peach">AL</span><span class="gr-avatar gr-avatar--sage">JW</span><span class="gr-avatar gr-avatar--lavender">MK</span><span class="gr-avatar gr-avatar--more">+3</span></div></div><div class="demo-progress-list"><div class="gr-row"><b>Design system</b><span class="gr-grow"></span><span class="gr-muted">72%</span></div><div class="gr-progress" role="progressbar" aria-label="Design system completion" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"><span style="--gr-value:72%"></span></div><div class="gr-row"><b>QA pass</b><span class="gr-grow"></span><span class="gr-muted">100%</span></div><div class="gr-progress gr-progress--good gr-progress--sm" role="progressbar" aria-label="QA pass completion" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span style="--gr-value:100%"></span></div></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Empty state</div><div class="gr-empty"><span class="demo-empty-illustration"><svg><use href="#ic-box"/></svg></span><strong>Nothing here yet</strong><span>Make your first project to get started.</span><button class="gr-button gr-button--secondary gr-button--sm" data-toast="Create project">Create project</button></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Loading skeletons</div><div class="gr-stack"><span class="gr-skeleton" style="width:38%;height:13px"></span><span class="gr-skeleton" style="width:94%;height:10px"></span><span class="gr-skeleton" style="width:72%;height:10px"></span><div class="gr-row"><span class="gr-skeleton" style="height:28px;width:28px;border-radius:50%"></span><span class="gr-skeleton" style="height:10px;width:40%"></span></div></div></div>
+          </div>
+        </section>
+
+        <section class="gr-section" id="status">
+          <div class="gr-section__header"><h2>08 / Status & priority</h2><p>Glyphs are always paired with text, never colour alone.</p></div>
+          <div class="gr-grid gr-grid--two">
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Workflow status <span>.gr-status[data-status]</span></div><div class="demo-control-row demo-glyph-row"><span class="gr-status-label"><span class="gr-status" data-status="backlog"></span>Backlog</span><span class="gr-status-label"><span class="gr-status" data-status="todo"></span>To do</span><span class="gr-status-label"><span class="gr-status" data-status="progress"></span>In progress</span><span class="gr-status-label"><span class="gr-status" data-status="review"></span>Review</span><span class="gr-status-label"><span class="gr-status" data-status="done"></span>Done</span></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Priority <span>.gr-priority[data-level]</span></div><div class="demo-control-row demo-glyph-row"><span class="gr-status-label"><span class="gr-priority" data-level="urgent" aria-hidden="true"><i></i><i></i><i></i></span>Urgent</span><span class="gr-status-label"><span class="gr-priority" data-level="high" aria-hidden="true"><i></i><i></i><i></i></span>High</span><span class="gr-status-label"><span class="gr-priority" data-level="medium" aria-hidden="true"><i></i><i></i><i></i></span>Medium</span><span class="gr-status-label"><span class="gr-priority" data-level="low" aria-hidden="true"><i></i><i></i><i></i></span>Low</span><span class="gr-status-label"><span class="gr-priority" data-level="none" aria-hidden="true"><i></i><i></i><i></i></span>No priority</span></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Labels <span>8 hues, AA contrast in both themes</span></div><div class="demo-control-row"><span class="gr-tag gr-tag--violet"><span class="gr-tag__dot"></span>Design</span><span class="gr-tag gr-tag--blue"><span class="gr-tag__dot"></span>Frontend</span><span class="gr-tag gr-tag--teal"><span class="gr-tag__dot"></span>Backend</span><span class="gr-tag gr-tag--amber"><span class="gr-tag__dot"></span>Research</span><span class="gr-tag gr-tag--rose"><span class="gr-tag__dot"></span>Content</span><span class="gr-tag gr-tag--red"><span class="gr-tag__dot"></span>Bug</span><span class="gr-tag gr-tag--green"><span class="gr-tag__dot"></span>QA</span><span class="gr-tag gr-tag--orange"><span class="gr-tag__dot"></span>Growth</span><span class="gr-tag gr-tag--outline">Outline</span></div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Filter chips <span>Removable</span></div><div class="demo-control-row" id="chip-row"><span class="gr-chip"><b>Status</b> is In progress<button class="gr-chip__remove" type="button" aria-label="Remove filter: Status is In progress">×</button></span><span class="gr-chip"><b>Assignee</b> is Me<button class="gr-chip__remove" type="button" aria-label="Remove filter: Assignee is Me">×</button></span><span class="gr-chip"><b>Label</b> is Design<button class="gr-chip__remove" type="button" aria-label="Remove filter: Label is Design">×</button></span></div><p class="demo-component-note"><button type="button" class="gr-link" id="reset-chips">Reset filters</button></p></div>
           </div>
         </section>
 
         <section class="gr-section" id="patterns">
-          <div class="gr-section__header"><h2>06 / Task patterns</h2><p>Composable list, table and kanban structures.</p></div>
-          <div class="gr-card demo-component-card demo-pattern-card">
+          <div class="gr-section__header"><h2>09 / Task patterns</h2><p>Composable list, table and kanban structures.</p></div>
+          <div class="gr-card demo-component-card demo-pattern-card" data-demo-code>
             <div class="demo-card-caption">Table <span>Semantic table markup</span></div>
             <div class="gr-table-wrap"><table class="gr-table"><thead><tr><th scope="col">Task</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Assignee</th><th scope="col">Due</th></tr></thead><tbody>
-              <tr><td><strong>Refresh onboarding flow</strong><small>DES-041</small></td><td><span class="gr-badge gr-badge--accent">In progress</span></td><td><span class="demo-priority demo-priority--high">● High</span></td><td><span class="gr-row"><span class="gr-avatar gr-avatar--sage">JW</span>Jordan</span></td><td>Nov 25</td></tr>
-              <tr><td><strong>Component audit</strong><small>SYS-015</small></td><td><span class="gr-badge gr-badge--good">Completed</span></td><td><span class="demo-priority">● Medium</span></td><td><span class="gr-row"><span class="gr-avatar gr-avatar--peach">AL</span>Alex</span></td><td>Nov 28</td></tr>
-              <tr><td><strong>Improve mobile layouts</strong><small>FE-092</small></td><td><span class="gr-badge">To do</span></td><td><span class="demo-priority demo-priority--low">● Low</span></td><td><span class="gr-row"><span class="gr-avatar gr-avatar--lavender">MK</span>Morgan</span></td><td>Dec 02</td></tr>
+              <tr><td><strong>Refresh onboarding flow</strong><small>DES-041</small></td><td><span class="gr-status-label"><span class="gr-status" data-status="progress"></span>In progress</span></td><td><span class="gr-status-label"><span class="gr-priority" data-level="high" aria-hidden="true"><i></i><i></i><i></i></span>High</span></td><td><span class="gr-row"><span class="gr-avatar gr-avatar--sage">JW</span>Jordan</span></td><td>Nov 25</td></tr>
+              <tr><td><strong>Component audit</strong><small>SYS-015</small></td><td><span class="gr-status-label"><span class="gr-status" data-status="done"></span>Done</span></td><td><span class="gr-status-label"><span class="gr-priority" data-level="medium" aria-hidden="true"><i></i><i></i><i></i></span>Medium</span></td><td><span class="gr-row"><span class="gr-avatar gr-avatar--peach">AL</span>Alex</span></td><td>Nov 28</td></tr>
+              <tr><td><strong>Improve mobile layouts</strong><small>FE-092</small></td><td><span class="gr-status-label"><span class="gr-status" data-status="todo"></span>To do</span></td><td><span class="gr-status-label"><span class="gr-priority" data-level="low" aria-hidden="true"><i></i><i></i><i></i></span>Low</span></td><td><span class="gr-row"><span class="gr-avatar gr-avatar--lavender">MK</span>Morgan</span></td><td>Dec 02</td></tr>
             </tbody></table></div>
           </div>
-          <div class="gr-card demo-component-card demo-pattern-card demo-board-wrap">
-            <div class="demo-card-caption">Kanban board <span>Card composition</span></div>
-            <div class="gr-kanban">
-              <div class="gr-kanban-column"><div class="gr-kanban-column__heading"><span class="demo-dot"></span>To do <small>2</small></div><div class="gr-kanban-card"><b>Document component API</b><span class="gr-tag gr-tag--blue">Documentation</span><div class="gr-row"><span class="gr-faint">DOC-013</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--lavender">MK</span></div></div><div class="gr-kanban-card"><b>Responsive audit</b><div class="gr-row"><span class="gr-badge gr-badge--warning">Medium</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--sky">CN</span></div></div></div>
-              <div class="gr-kanban-column"><div class="gr-kanban-column__heading"><span class="demo-dot demo-dot--amber"></span>In progress <small>2</small></div><div class="gr-kanban-card"><b>Refine navigation states</b><span class="gr-tag gr-tag--violet">Design</span><div class="gr-row"><span class="gr-faint">DES-108</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--peach">AL</span></div></div><div class="gr-kanban-card"><b>Dark palette review</b><div class="gr-row"><span class="gr-badge gr-badge--accent">Active</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--sage">JW</span></div></div></div>
-              <div class="gr-kanban-column"><div class="gr-kanban-column__heading"><span class="demo-dot demo-dot--green"></span>Done <small>1</small></div><div class="gr-kanban-card"><b>Define semantic colors</b><span class="gr-tag gr-tag--green">Foundations</span><div class="gr-row"><span class="gr-faint">SYS-001</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--peach">AL</span></div></div></div>
-            </div>
+          <div class="gr-card demo-component-card demo-pattern-card demo-board-wrap" data-demo-code>
+            <div class="demo-card-caption">Kanban board <span>Drag a card — or focus it and press Space</span></div>
+            <gr-kanban id="demo-board" aria-label="Sprint board">
+              <div class="gr-kanban">
+                <section class="gr-kanban-column" data-gr-column="todo" aria-label="To do">
+                  <div class="gr-kanban-column__heading"><span class="gr-status" data-status="todo"></span>To do <small data-gr-count>2</small></div>
+                  <div class="gr-kanban-column__cards" data-gr-list>
+                    <article class="gr-kanban-card" data-gr-card="DOC-013"><b>Document component API</b><span class="gr-tag gr-tag--blue">Documentation</span><div class="gr-row"><span class="gr-faint">DOC-013</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--sm gr-avatar--lavender">MK</span></div></article>
+                    <article class="gr-kanban-card" data-gr-card="QA-031"><b>Responsive audit</b><div class="gr-row"><span class="gr-status-label"><span class="gr-priority" data-level="medium" aria-hidden="true"><i></i><i></i><i></i></span>Medium</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--sm gr-avatar--sky">CN</span></div></article>
+                  </div>
+                </section>
+                <section class="gr-kanban-column" data-gr-column="progress" aria-label="In progress">
+                  <div class="gr-kanban-column__heading"><span class="gr-status" data-status="progress"></span>In progress <small data-gr-count>2</small></div>
+                  <div class="gr-kanban-column__cards" data-gr-list>
+                    <article class="gr-kanban-card" data-gr-card="DES-108"><b>Refine navigation states</b><span class="gr-tag gr-tag--violet">Design</span><div class="gr-row"><span class="gr-faint">DES-108</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--sm gr-avatar--peach">AL</span></div></article>
+                    <article class="gr-kanban-card" data-gr-card="DES-112"><b>Dark palette review</b><div class="gr-row"><span class="gr-badge gr-badge--accent">Active</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--sm gr-avatar--sage">JW</span></div></article>
+                  </div>
+                </section>
+                <section class="gr-kanban-column" data-gr-column="review" aria-label="Review">
+                  <div class="gr-kanban-column__heading"><span class="gr-status" data-status="review"></span>Review <small data-gr-count>1</small></div>
+                  <div class="gr-kanban-column__cards" data-gr-list>
+                    <article class="gr-kanban-card" data-gr-card="FE-120"><b>Popover positioning</b><span class="gr-tag gr-tag--teal">Frontend</span><div class="gr-row"><span class="gr-faint">FE-120</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--sm gr-avatar--sky">CN</span></div></article>
+                  </div>
+                </section>
+                <section class="gr-kanban-column" data-gr-column="done" aria-label="Done">
+                  <div class="gr-kanban-column__heading"><span class="gr-status" data-status="done"></span>Done <small data-gr-count>1</small></div>
+                  <div class="gr-kanban-column__cards" data-gr-list>
+                    <article class="gr-kanban-card" data-gr-card="SYS-001"><b>Define semantic colors</b><span class="gr-tag gr-tag--green">Foundations</span><div class="gr-row"><span class="gr-faint">SYS-001</span><span class="gr-grow"></span><span class="gr-avatar gr-avatar--sm gr-avatar--peach">AL</span></div></article>
+                  </div>
+                </section>
+              </div>
+            </gr-kanban>
+            <div class="demo-component-note demo-board-foot"><span id="board-log" aria-hidden="true" data-i18n-skip>Tip: “Done” rejects cards that skipped Review — try it.</span><button type="button" class="gr-link" id="reset-board">Reset board</button></div>
           </div>
         </section>
 
         <section class="gr-section" id="overlays">
-          <div class="gr-section__header"><h2>07 / Overlays & feedback</h2><p>Keyboard-aware overlays and safe feedback.</p></div>
+          <div class="gr-section__header"><h2>10 / Overlays & feedback</h2><p>Keyboard-aware overlays and safe feedback.</p></div>
           <div class="gr-card demo-component-card">
             <div class="demo-card-caption">Interactive primitives <span>Click to try</span></div>
             <div class="demo-control-row">
               <gr-dropdown><button type="button" class="gr-button gr-button--secondary" data-gr-trigger aria-expanded="false">Dropdown <svg><use href="#ic-chevron"/></svg></button><div class="gr-menu" role="menu" hidden><button type="button" role="menuitem" data-value="Edit item">Edit item</button><button type="button" role="menuitem" data-value="Duplicate item">Duplicate item</button><div class="gr-menu__divider"></div><button type="button" role="menuitem" data-value="Move to archive">Move to archive</button></div></gr-dropdown>
               <button class="gr-button gr-button--secondary" type="button" data-open-dialog>Open dialog</button>
+              <button class="gr-button gr-button--secondary" type="button" id="open-drawer-demo">Open drawer</button>
+              <button class="gr-button gr-button--secondary" type="button" id="open-confirm"><svg><use href="#ic-trash"/></svg>Confirm delete</button>
               <button class="gr-button gr-button--secondary" type="button" data-toast="Changes saved successfully" data-tone="success">Success toast</button>
               <button class="gr-button gr-button--secondary" type="button" data-toast="Please check the required fields" data-tone="danger">Error toast</button>
+              <button class="gr-button gr-button--secondary" type="button" id="toast-action-demo">Toast with action</button>
               <button class="gr-button gr-button--primary" type="button" data-command><svg><use href="#ic-search"/></svg>Command palette</button>
             </div>
-            <p class="demo-component-note">Dialog and palette use the native HTML dialog for focus management and Escape handling.</p>
+            <p class="demo-component-note">Dialog, drawer and palette use the native HTML dialog for focus management and Escape handling. Toasts pause while hovered.</p>
+          </div>
+          <div class="gr-grid gr-grid--two demo-stacked-grid">
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">Inline alerts</div><div class="gr-stack">
+              <div class="gr-alert" role="note"><svg><use href="#ic-info"/></svg><div class="gr-alert__body"><b>Heads up.</b> Timeline dependencies show as dashed when out of order.</div></div>
+              <div class="gr-alert gr-alert--good" role="status"><svg><use href="#ic-check-circle"/></svg><div class="gr-alert__body">Project archived. <button type="button" class="gr-link" data-toast="Archive undone" data-tone="success">Undo</button></div></div>
+              <div class="gr-alert gr-alert--warning" role="note"><svg><use href="#ic-triangle"/></svg><div class="gr-alert__body">3 tasks due this week are not started.</div></div>
+              <div class="gr-alert gr-alert--danger" role="alert"><svg><use href="#ic-alert"/></svg><div class="gr-alert__body"><b>Your changes couldn't be saved.</b> <button type="button" class="gr-link" data-toast="Retrying…">Try again</button></div></div>
+            </div></div>
+            <div class="gr-card demo-component-card" data-demo-code><div class="demo-card-caption">System states <span>Error · permission · loading</span></div><div class="demo-states">
+              <div class="gr-empty gr-empty--danger"><span class="gr-empty__glyph"><svg><use href="#ic-wifi-off"/></svg></span><strong>You're offline</strong><span>We'll sync your changes when you're back.</span><button type="button" class="gr-button gr-button--secondary gr-button--sm" data-toast="Still offline" data-tone="danger">Try again</button></div>
+              <div class="gr-empty"><span class="gr-empty__glyph"><svg><use href="#ic-lock"/></svg></span><strong>You don't have access</strong><span>Request access from the project owner.</span></div>
+              <div class="gr-row demo-loading-row"><span class="gr-spinner" aria-hidden="true"></span><span role="status">Loading project…</span></div>
+            </div></div>
           </div>
         </section>
 
         <section class="gr-section demo-get-started" id="install">
-          <div class="gr-section__header"><h2>Get started</h2><p>Use the source directly, without a build step.</p></div>
+          <div class="gr-section__header"><h2>Get started</h2><p>Use the source directly, without a build step. Every card above has a Code view you can copy.</p></div>
           <div class="gr-card demo-install-panel">
             <div class="demo-card-caption"><span>HTML / JS</span><button type="button" class="gr-button gr-button--ghost gr-button--sm" data-copy="usage-code"><svg><use href="#ic-copy"/></svg>Copy</button></div>
             <pre id="usage-code"><code>&lt;link rel="stylesheet" href="./src/index.css" /&gt;
-&lt;div class="gr-ui"&gt;
+&lt;div class="gr-ui" data-gr-theme="system"&gt;
   &lt;button class="gr-button gr-button--primary"&gt;
     Create task
   &lt;/button&gt;
 &lt;/div&gt;
 &lt;script type="module"&gt;
-  import { defineGr8rElements } from "./src/index.js";
-  defineGr8rElements();
+  import { defineGr8rElements, applyGr8rPreferences } from "./src/index.js";
+  defineGr8rElements();   // all 12 elements, idempotent
+  applyGr8rPreferences(document.querySelector(".gr-ui"), {
+    theme: "system", accent: "indigo", density: "comfortable", motion: "full"
+  });
 &lt;/script&gt;</code></pre>
           </div>
           <div class="demo-endnote"><span class="demo-mark">g<span>.</span></span><span>Less interface. More intention.</span><a href="#overview">Back to top ↑</a></div>
@@ -272,19 +523,28 @@
 
   <gr-dialog id="create-dialog"><dialog aria-labelledby="create-dialog-title">
     <div class="gr-dialog-header"><h2 id="create-dialog-title">Create a task</h2><button type="button" class="gr-icon-button" data-gr-close aria-label="Close">×</button></div>
-    <form id="create-task-form">
-      <div class="gr-dialog-body"><div class="gr-field"><label class="gr-label" for="task-title-input">Task title</label><input class="gr-input" id="task-title-input" autofocus aria-describedby="task-title-hint" name="task" placeholder="What needs to be done?" maxlength="120" required /><span class="gr-hint" id="task-title-hint">Give your task a clear, actionable name.</span></div><label class="gr-field"><span class="gr-label">Priority</span><select class="gr-select" name="priority"><option>Normal</option><option>High</option><option>Low</option></select></label><label class="gr-field"><span class="gr-label">Description</span><textarea class="gr-textarea" name="description" maxlength="2000" placeholder="Optional details"></textarea></label></div>
+    <form id="create-task-form" novalidate>
+      <div class="gr-dialog-body"><div class="gr-field"><label class="gr-label" for="task-title-input">Task title</label><input class="gr-input" id="task-title-input" autofocus aria-describedby="task-title-hint" name="task" placeholder="What needs to be done?" maxlength="120" required /><span class="gr-hint" id="task-title-hint">Give your task a clear, actionable name.</span></div><label class="gr-field"><span class="gr-label">Priority</span><select class="gr-select" name="priority"><option value="Normal">Normal</option><option value="High">High</option><option value="Low">Low</option></select></label><label class="gr-field"><span class="gr-label">Description</span><textarea class="gr-textarea" name="description" maxlength="2000" placeholder="Optional details"></textarea></label></div>
       <div class="gr-dialog-footer"><button type="button" class="gr-button gr-button--ghost" data-gr-close>Cancel</button><button class="gr-button gr-button--primary" type="submit">Create task</button></div>
     </form>
   </dialog></gr-dialog>
-  <gr-dialog id="task-details"><dialog aria-labelledby="task-details-title">
+  <gr-drawer id="task-details"><dialog aria-labelledby="task-details-title">
     <div class="gr-dialog-header"><h2 id="task-details-title">Task details</h2><button class="gr-icon-button" type="button" data-gr-close aria-label="Close task details">×</button></div>
-    <div class="gr-dialog-body"><div class="gr-row"><span class="gr-badge" id="detail-id"></span><span class="gr-badge gr-badge--accent" id="detail-priority"></span></div><h3 id="detail-title"></h3><p class="demo-detail-description" id="detail-description"></p><span class="gr-hint" id="detail-status"></span></div>
-    <div class="gr-dialog-footer"><button class="gr-button gr-button--secondary" type="button" data-gr-close>Close</button></div>
+    <div class="gr-drawer__body">
+      <div class="gr-row"><span class="gr-badge" id="detail-id"></span><span class="gr-badge gr-badge--accent" id="detail-priority"></span></div>
+      <h3 id="detail-title" data-i18n-skip></h3>
+      <dl class="gr-props"><dt>Status</dt><dd><span class="gr-status" id="detail-status-icon" data-status="todo"></span><span class="gr-hint" id="detail-status" data-i18n-skip></span></dd><dt>Category</dt><dd><span class="gr-tag" id="detail-category"></span></dd></dl>
+      <div><span class="gr-label demo-detail-label">Description</span><p class="demo-detail-description" id="detail-description" data-i18n-skip></p></div>
+    </div>
+    <div class="gr-dialog-footer"><button class="gr-button gr-button--ghost demo-detail-delete" type="button" id="detail-delete"><svg><use href="#ic-trash"/></svg>Delete</button><span class="gr-grow"></span><button class="gr-button gr-button--secondary" type="button" data-gr-close>Close</button><button class="gr-button gr-button--primary" type="button" id="detail-toggle">Mark complete</button></div>
+  </dialog></gr-drawer>
+  <gr-dialog id="confirm-dialog"><dialog aria-labelledby="confirm-title" aria-describedby="confirm-description" class="demo-confirm">
+    <div class="gr-dialog-body demo-confirm-body"><span class="demo-confirm-icon" aria-hidden="true"><svg><use href="#ic-trash"/></svg></span><div><h2 id="confirm-title">Delete “Website redesign”?</h2><p id="confirm-description">This removes 24 tasks and 6 files for everyone in the project. You can undo for a few seconds.</p></div></div>
+    <div class="gr-dialog-footer"><button type="button" class="gr-button gr-button--ghost" data-gr-close>Cancel</button><button type="button" class="gr-button gr-button--danger" id="confirm-delete">Delete project</button></div>
   </dialog></gr-dialog>
   <gr-command-palette id="command-palette"><dialog aria-label="Command palette">
     <input type="search" class="gr-command-input" placeholder="Search for an action or component..." aria-label="Search commands" />
-    <div class="gr-command-list"><button data-gr-command="Go to overview" type="button"><svg><use href="#ic-grid"/></svg>Overview</button><button data-gr-command="Go to install" type="button"><svg><use href="#ic-box"/></svg>Installation</button><button data-gr-command="Go to navigation" type="button"><svg><use href="#ic-layers"/></svg>Navigation</button><button data-gr-command="Go to data" type="button"><svg><use href="#ic-list"/></svg>Data display</button><button data-gr-command="Go to overlays" type="button"><svg><use href="#ic-box"/></svg>Overlays & feedback</button><button data-gr-command="Go to foundations" type="button"><svg><use href="#ic-palette"/></svg>Foundations</button><button data-gr-command="Go to buttons" type="button"><svg><use href="#ic-sliders"/></svg>Buttons & actions</button><button data-gr-command="Go to forms" type="button"><svg><use href="#ic-box"/></svg>Form controls</button><button data-gr-command="Go to patterns" type="button"><svg><use href="#ic-grid"/></svg>Task patterns</button><button data-gr-command="Create task" type="button"><svg><use href="#ic-plus"/></svg>Create task</button><button data-gr-command="Toggle theme" type="button"><svg><use href="#ic-moon"/></svg>Toggle theme</button></div>
+    <div class="gr-command-list"><button data-gr-command="Go to overview" type="button"><svg><use href="#ic-grid"/></svg>Overview</button><button data-gr-command="Go to install" type="button"><svg><use href="#ic-box"/></svg>Installation</button><button data-gr-command="Go to motion" type="button"><svg><use href="#ic-sparkle"/></svg>Motion</button><button data-gr-command="Go to pickers" type="button"><svg><use href="#ic-calendar"/></svg>Pickers & popovers</button><button data-gr-command="Go to navigation" type="button"><svg><use href="#ic-layers"/></svg>Navigation</button><button data-gr-command="Go to data" type="button"><svg><use href="#ic-list"/></svg>Data display</button><button data-gr-command="Go to status" type="button"><svg><use href="#ic-check-circle"/></svg>Status & priority</button><button data-gr-command="Go to overlays" type="button"><svg><use href="#ic-box"/></svg>Overlays & feedback</button><button data-gr-command="Go to foundations" type="button"><svg><use href="#ic-palette"/></svg>Foundations</button><button data-gr-command="Go to buttons" type="button"><svg><use href="#ic-sliders"/></svg>Buttons & actions</button><button data-gr-command="Go to forms" type="button"><svg><use href="#ic-box"/></svg>Form controls</button><button data-gr-command="Go to patterns" type="button"><svg><use href="#ic-grid"/></svg>Task patterns</button><button data-gr-command="Create task" type="button"><svg><use href="#ic-plus"/></svg>Create task</button><button data-gr-command="Toggle theme" type="button"><svg><use href="#ic-moon"/></svg>Toggle theme</button><button data-gr-command="Switch language" type="button"><svg><use href="#ic-globe"/></svg>Switch language</button><button data-gr-command="Toggle reduced motion" type="button"><svg><use href="#ic-sparkle"/></svg>Toggle reduced motion</button><button data-gr-command="Reset playground" type="button"><svg><use href="#ic-trash"/></svg>Reset sample data</button></div>
     <div class="gr-command-footer"><span><span class="gr-kbd">↑</span> <span class="gr-kbd">↓</span> Navigate</span><span><span class="gr-kbd">↵</span> Select</span><span><span class="gr-kbd">Esc</span> Close</span></div>
   </dialog></gr-command-palette>
   <gr-toast-stack id="toast-stack"></gr-toast-stack>

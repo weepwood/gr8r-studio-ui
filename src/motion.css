@@ -1,0 +1,63 @@
+/* Gr8r Studio UI — motion.
+ * One-shot effects for state changes, applied by adding a class (see playEffect in internal.js
+ * or the gallery). High-frequency surfaces (menus, palette rows, scrolling lists) stay instant
+ * or use short opacity/transform transitions only. Every effect has a reduced-motion fallback.
+ */
+@keyframes gr-rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* Individual translate/scale compose with inline `transform` (e.g. viewport shifts on menus). */
+@keyframes gr-float-in { from { opacity: 0; translate: 0 var(--gr-float-from, -4px); scale: .97; } to { opacity: 1; translate: none; scale: none; } }
+@keyframes gr-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes gr-pop { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes gr-wash-accent { from { background-color: var(--gr-accent-wash); } to { background-color: transparent; } }
+@keyframes gr-wash-good { from { background-color: color-mix(in srgb, var(--gr-good) 13%, transparent); } to { background-color: transparent; } }
+@keyframes gr-strike { from { background-size: 0 1.5px; } to { background-size: 100% 1.5px; } }
+@keyframes gr-land { 0% { transform: scale(1.035) rotate(-1deg); box-shadow: var(--gr-shadow-drag); } 100% { transform: none; box-shadow: var(--gr-shadow-card); } }
+@keyframes gr-leave { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(10px); } }
+@keyframes gr-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+@keyframes gr-grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes gr-toast-timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* Entrance, optionally staggered with style="--gr-stagger: 2" (40 ms steps, capped by authors). */
+.gr-fx-rise { animation: gr-rise-in var(--gr-duration-slow) var(--gr-ease-out) both; animation-delay: calc(var(--gr-stagger, 0) * 40ms); }
+
+/* Something was created: rise in, then fade an accent wash out. */
+.gr-fx-added { animation: gr-rise-in 260ms var(--gr-ease-out) both, gr-wash-accent 1.3s var(--gr-ease-out) both; }
+
+/* Something was completed: green wash, check pops, title is struck through left-to-right. */
+.gr-fx-done { animation: gr-wash-good 1s var(--gr-ease-out) both; }
+.gr-fx-done :where(.gr-checkbox) { animation: gr-pop 380ms var(--gr-ease-spring) both; }
+.gr-fx-done :where(.gr-task-row__title, [data-gr-strike]) {
+  text-decoration: none !important;
+  background: linear-gradient(currentColor, currentColor) 0 58% / 0 1.5px no-repeat;
+  animation: gr-strike 340ms 80ms var(--gr-ease-out) forwards;
+}
+
+/* A dragged card settled into its slot (keyboard moves; pointer drops glide with WAAPI). */
+.gr-fx-land { animation: gr-land 460ms var(--gr-ease-spring) both; }
+
+/* Exit for removed rows/cards. Remove the element after ~180 ms. */
+.gr-fx-leave { animation: gr-leave 180ms var(--gr-ease-in-out) both; pointer-events: none; }
+
+/* Validation nudge: never loops, and is skipped entirely for reduced motion. */
+.gr-fx-shake { animation: gr-shake 320ms var(--gr-ease-out) both; }
+
+/* Progress fill grows from the start edge on first paint. */
+.gr-progress--animate > span { transform-origin: left center; animation: gr-grow-x 720ms 120ms var(--gr-ease-out) both; }
+
+/* Floating surfaces open from their anchor side. :is() keeps the rule valid where :popover-open is unknown. */
+.gr-ui :is(.gr-menu:not([hidden]), .gr-floating:popover-open, .gr-floating:not([popover]):not([hidden])) {
+  animation: gr-float-in 140ms var(--gr-ease-out) backwards;
+}
+.gr-ui .gr-floating[data-side="top"] { --gr-float-from: 4px; transform-origin: bottom left; }
+.gr-ui .gr-floating:not([data-side="top"]) { transform-origin: top left; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gr-ui :is(.gr-fx-rise, .gr-fx-added, .gr-fx-land, .gr-fx-leave, .gr-menu, .gr-floating) { animation: gr-fade-in 120ms both !important; }
+  .gr-ui .gr-fx-leave { animation: none !important; opacity: 0; }
+  .gr-ui :is(.gr-fx-done, .gr-fx-done .gr-checkbox, .gr-fx-shake, .gr-progress--animate > span) { animation: none !important; }
+  .gr-ui .gr-fx-done :where(.gr-task-row__title, [data-gr-strike]) { animation: none; background: none; }
+}
+.gr-ui[data-gr-motion="reduce"] :is(.gr-fx-rise, .gr-fx-added, .gr-fx-land, .gr-menu, .gr-floating) { animation: gr-fade-in 120ms both !important; }
+.gr-ui[data-gr-motion="reduce"] .gr-fx-leave { animation: none !important; opacity: 0; }
+.gr-ui[data-gr-motion="reduce"] :is(.gr-fx-done, .gr-fx-done .gr-checkbox, .gr-fx-shake, .gr-progress--animate > span) { animation: none !important; }
+.gr-ui[data-gr-motion="reduce"] .gr-fx-done :where(.gr-task-row__title, [data-gr-strike]) { animation: none; background: none; }

@@ -202,3 +202,153 @@
 @media (prefers-reduced-motion: reduce) { .gr-switch-button::before, .gr-switch-button::after { transition: none; } }
 
 .gr-menu [role="menuitem"][aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+
+
+/* ===================== v0.3 additions ===================== */
+
+/* Tactile selection controls: the check mark scales in, the switch thumb springs. */
+.gr-checkbox { transition: background var(--gr-motion-fast), border-color var(--gr-motion-fast), transform var(--gr-motion-fast); }
+.gr-checkbox::after { content: ""; display: block; width: 8px; height: 5px; border-left: 2px solid var(--gr-accent-contrast); border-bottom: 2px solid var(--gr-accent-contrast); transform: translate(3px, 3px) rotate(-45deg) scale(0); transition: transform 180ms var(--gr-ease-spring); }
+.gr-checkbox:checked::after { transform: translate(3px, 3px) rotate(-45deg) scale(1); }
+.gr-checkbox:active:not(:disabled), .gr-radio:active:not(:disabled) { transform: scale(.88); }
+.gr-switch-button::after { transition: transform 260ms var(--gr-ease-spring); }
+
+/* Tabs: a single indicator slides between tabs once gr-tabs has measured them. */
+.gr-tab-list[data-gr-indicator] { position: relative; }
+.gr-tab-list[data-gr-indicator] [role="tab"][aria-selected="true"] { border-bottom-color: transparent; }
+.gr-tab-list[data-gr-indicator]::after { content: ""; position: absolute; left: 0; bottom: -1px; height: 2px; width: var(--gr-indicator-w, 0); border-radius: 2px 2px 0 0; background: var(--gr-accent); transform: translateX(var(--gr-indicator-x, 0)); pointer-events: none; }
+.gr-tab-list[data-gr-indicator="ready"]::after { transition: transform 240ms var(--gr-ease-out), width 240ms var(--gr-ease-out); }
+
+/* Status glyphs (backlog → done). Pair with visible text or aria-label. */
+.gr-status { --gr-status: var(--gr-ink-muted); display: inline-block; flex: 0 0 auto; width: 14px; height: 14px; border-radius: 50%; border: 1.6px solid var(--gr-status); position: relative; }
+.gr-status[data-status="backlog"] { border-style: dashed; }
+.gr-status[data-status="todo"] { --gr-status: var(--gr-ink-secondary); }
+.gr-status[data-status="progress"] { --gr-status: var(--gr-caution); background: conic-gradient(var(--gr-status) 0 50%, transparent 50%) content-box; padding: 2px; }
+.gr-status[data-status="review"] { --gr-status: var(--gr-violet); background: conic-gradient(var(--gr-status) 0 75%, transparent 75%) content-box; padding: 2px; }
+.gr-status[data-status="done"] { --gr-status: var(--gr-good); background: var(--gr-status); }
+.gr-status[data-status="done"]::after { content: ""; position: absolute; left: 3.5px; top: 2px; width: 3px; height: 6px; border: solid var(--gr-surface); border-width: 0 1.6px 1.6px 0; transform: rotate(45deg); }
+.gr-status[data-status="cancelled"] { --gr-status: var(--gr-ink-muted); background: var(--gr-status); }
+.gr-status-label { display: inline-flex; align-items: center; gap: 7px; font-size: var(--gr-text-sm); font-weight: 500; white-space: nowrap; }
+
+/* Priority: three rising bars; urgent is a filled exclamation box. */
+.gr-priority { --gr-priority: var(--gr-ink-muted); display: inline-flex; align-items: flex-end; gap: 1.5px; width: 14px; height: 14px; padding: 1px 1px 2px; flex: 0 0 auto; }
+.gr-priority > i { display: block; width: 3px; border-radius: 1px; background: color-mix(in srgb, var(--gr-ink-muted) 35%, transparent); }
+.gr-priority > i:nth-child(1) { height: 40%; } .gr-priority > i:nth-child(2) { height: 70%; } .gr-priority > i:nth-child(3) { height: 100%; }
+.gr-priority[data-level="low"] > i:nth-child(-n + 1),
+.gr-priority[data-level="medium"] > i:nth-child(-n + 2),
+.gr-priority[data-level="high"] > i { background: var(--gr-ink-secondary); }
+.gr-priority[data-level="urgent"] { align-items: center; justify-content: center; padding: 0; border-radius: 3px; background: var(--gr-danger); color: var(--gr-danger-contrast); font: 800 10px/1 var(--gr-font); }
+.gr-priority[data-level="urgent"]::before { content: "!"; }
+.gr-priority[data-level="urgent"] > i { display: none; }
+
+/* More label colours, plus a leading dot variant. */
+.gr-tag--teal { color: var(--gr-teal); background: color-mix(in srgb, var(--gr-teal) 11%, transparent); }
+.gr-tag--amber { color: var(--gr-caution); background: color-mix(in srgb, var(--gr-caution) 12%, transparent); }
+.gr-tag--rose { color: var(--gr-rose); background: color-mix(in srgb, var(--gr-rose) 11%, transparent); }
+.gr-tag--red { color: var(--gr-danger); background: color-mix(in srgb, var(--gr-danger) 11%, transparent); }
+.gr-tag--orange { color: var(--gr-orange); background: color-mix(in srgb, var(--gr-orange) 12%, transparent); }
+.gr-tag--outline { background: transparent; border: 1px solid var(--gr-line-strong); color: var(--gr-ink-secondary); }
+.gr-tag__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
+
+/* Avatar sizes and presence. */
+.gr-avatar--xs { width: 20px; height: 20px; font-size: 8px; border-width: 1.5px; }
+.gr-avatar--sm { width: 24px; height: 24px; font-size: 9px; }
+.gr-avatar--lg { width: 36px; height: 36px; font-size: 12px; }
+.gr-avatar { position: relative; }
+.gr-avatar[data-presence]::after { content: ""; position: absolute; right: -2px; bottom: -2px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--gr-surface); background: var(--gr-ink-muted); }
+.gr-avatar[data-presence="online"]::after { background: var(--gr-good); }
+.gr-avatar[data-presence="busy"]::after { background: var(--gr-danger); }
+.gr-avatar-stack .gr-avatar--more { background: var(--gr-surface-muted); color: var(--gr-ink-muted); }
+
+/* Inline alerts. */
+.gr-alert { --gr-alert: var(--gr-info); display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--gr-alert) 26%, var(--gr-line)); border-radius: var(--gr-radius-md); background: color-mix(in srgb, var(--gr-alert) 7%, var(--gr-surface)); color: var(--gr-ink); font-size: var(--gr-text-sm); line-height: 1.5; }
+.gr-alert > svg, .gr-alert__icon { color: var(--gr-alert); margin-top: 1px; }
+.gr-alert--good { --gr-alert: var(--gr-good); }
+.gr-alert--warning { --gr-alert: var(--gr-caution); }
+.gr-alert--danger { --gr-alert: var(--gr-danger); }
+.gr-alert__body { flex: 1; min-width: 0; }
+.gr-alert__body b { font-weight: 650; }
+.gr-link { border: 0; padding: 0; background: none; color: var(--gr-accent); font: inherit; font-weight: 550; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
+
+/* Breadcrumbs. */
+.gr-breadcrumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; font-size: var(--gr-text-sm); color: var(--gr-ink-muted); }
+.gr-breadcrumbs ol { display: contents; list-style: none; }
+.gr-breadcrumbs li { display: inline-flex; align-items: center; gap: 2px; }
+.gr-breadcrumbs li + li::before { content: "/"; padding: 0 6px; color: var(--gr-line-strong); }
+.gr-breadcrumbs :is(a, button) { border: 0; background: none; padding: 3px 5px; border-radius: var(--gr-radius-xs); color: inherit; font: inherit; }
+.gr-breadcrumbs [aria-current="page"] { color: var(--gr-ink); font-weight: 600; }
+
+/* Filter chips (removable). */
+.gr-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 26px; padding: 0 4px 0 9px; border: 1px solid var(--gr-line-strong); border-radius: var(--gr-radius-pill); background: var(--gr-surface); color: var(--gr-ink-secondary); font-size: var(--gr-text-sm); white-space: nowrap; }
+.gr-chip b { color: var(--gr-ink); font-weight: 600; }
+.gr-chip__remove { display: inline-grid; place-items: center; width: 20px; height: 20px; border: 0; border-radius: 50%; background: transparent; color: var(--gr-ink-muted); font-size: 14px; line-height: 1; }
+
+/* Stat group: one bordered strip, cells divided by hairlines. */
+.gr-stat-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); border: 1px solid var(--gr-line); border-radius: var(--gr-radius-lg); background: var(--gr-surface); overflow: hidden; }
+.gr-stat { display: grid; gap: 6px; padding: 16px 18px; min-width: 0; box-shadow: -1px 0 0 var(--gr-line), 0 -1px 0 var(--gr-line); }
+.gr-stat__label { display: flex; align-items: center; gap: 7px; color: var(--gr-ink-secondary); font-size: var(--gr-text-sm); }
+.gr-stat__value { font-size: 26px; font-weight: 650; letter-spacing: -.04em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.gr-stat__meta { font-size: var(--gr-text-sm); color: var(--gr-ink-muted); }
+.gr-stat__meta--good { color: var(--gr-good); }
+.gr-stat__meta--danger { color: var(--gr-danger); }
+
+/* Spinner & progress tones. */
+.gr-spinner { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--gr-line-strong); border-top-color: var(--gr-accent); animation: gr-spin .7s linear infinite; flex: 0 0 auto; }
+.gr-progress--good > span { background: var(--gr-good); }
+.gr-progress--danger > span { background: var(--gr-danger); }
+.gr-progress--sm { height: 4px; }
+.gr-empty--danger :where(.gr-empty__glyph) { color: var(--gr-danger); background: color-mix(in srgb, var(--gr-danger) 10%, transparent); }
+.gr-empty__glyph { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 4px; border-radius: 10px; background: var(--gr-surface-muted); color: var(--gr-accent); }
+.gr-empty__glyph svg { width: 20px; height: 20px; }
+
+/* Interactive kanban (gr-kanban). */
+.gr-kanban-column__cards { display: grid; gap: 7px; min-height: 48px; align-content: start; }
+.gr-kanban-column__cards > .gr-kanban-card { margin-bottom: 0; }
+.gr-ui gr-kanban { display: block; position: relative; }
+gr-kanban .gr-kanban-card[data-gr-card] { cursor: grab; touch-action: manipulation; -webkit-touch-callout: none; user-select: none; transition: border-color var(--gr-motion), box-shadow var(--gr-motion), transform var(--gr-motion); }
+gr-kanban .gr-kanban-card[data-gr-card]:focus-visible { outline: 2px solid var(--gr-accent); outline-offset: 2px; }
+gr-kanban .gr-kanban-card[data-gr-grabbed="true"] { border-color: var(--gr-accent); box-shadow: 0 0 0 3px var(--gr-accent-wash), var(--gr-shadow-hover); transform: translateY(-2px) rotate(-.6deg); }
+gr-kanban[data-gr-dragging] { user-select: none; cursor: grabbing; }
+/* .gr-kanban-card sets display: grid, which would otherwise override the hidden attribute. */
+gr-kanban [data-gr-card][hidden] { display: none !important; }
+.gr-kanban-placeholder { border: 1.5px dashed color-mix(in srgb, var(--gr-accent) 45%, var(--gr-line-strong)); border-radius: var(--gr-radius-sm); background: var(--gr-accent-wash); }
+.gr-kanban-ghost { position: fixed !important; top: 0; left: 0; z-index: var(--gr-z-drag); margin: 0 !important; pointer-events: none; cursor: grabbing; box-shadow: var(--gr-shadow-drag); will-change: transform; opacity: .97; }
+.gr-kanban-column { transition: border-color var(--gr-motion), background-color var(--gr-motion); }
+@media (hover: hover) and (pointer: fine) {
+  gr-kanban:not([data-gr-dragging]) .gr-kanban-card[data-gr-card]:hover { transform: translateY(-1px); box-shadow: var(--gr-shadow-hover); }
+  .gr-chip__remove:hover { background: var(--gr-surface-raised); color: var(--gr-ink); }
+  .gr-breadcrumbs :is(a, button):hover { background: var(--gr-surface-raised); color: var(--gr-ink); }
+  .gr-link:hover { text-decoration-thickness: 2px; }
+}
+
+/* Toast actions, warning tone and a pausable countdown. */
+.gr-toast { position: relative; overflow: hidden; }
+.gr-toast[data-tone="warning"] .gr-toast__dot { background: var(--gr-caution); }
+.gr-toast .gr-toast__action { margin-left: auto; min-width: 0; padding: 0 8px; font-size: var(--gr-text-sm); font-weight: 650; color: var(--gr-accent); }
+.gr-toast .gr-toast__action + button { margin-left: 0; }
+.gr-toast__timer { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: color-mix(in srgb, var(--gr-accent) 55%, transparent); transform-origin: left center; animation: gr-toast-timer var(--gr-toast-duration, 4200ms) linear forwards; }
+.gr-toast[data-tone="success"] .gr-toast__timer { background: color-mix(in srgb, var(--gr-good) 55%, transparent); }
+.gr-toast[data-tone="danger"] .gr-toast__timer { background: color-mix(in srgb, var(--gr-danger) 55%, transparent); }
+.gr-toast[data-paused] .gr-toast__timer { animation-play-state: paused; }
+
+/* Tooltips: generated only while hovered/focused (no hidden overflow at rest);
+   a keyframe holds them invisible briefly so passing pointers don't flash them. */
+@keyframes gr-tooltip-in { 0%, 62% { opacity: 0; translate: 0 3px; } 100% { opacity: 1; translate: 0 0; } }
+.gr-tooltip[data-gr-tooltip]:focus-visible::after { position: absolute; z-index: 30; content: attr(data-gr-tooltip); bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%); padding: 5px 8px; border-radius: 5px; background: var(--gr-ink); color: var(--gr-surface); font-size: 11px; white-space: nowrap; pointer-events: none; animation: gr-tooltip-in 140ms var(--gr-ease-out) both; animation-timing-function: linear; }
+@media (hover: hover) and (pointer: fine) {
+  .gr-tooltip[data-gr-tooltip]:hover::after { animation: gr-tooltip-in 520ms linear both; font-weight: 500; }
+}
+.gr-tooltip[data-gr-tooltip]:focus-visible::after { animation-duration: 140ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gr-checkbox::after, .gr-switch-button::after, .gr-tab-list[data-gr-indicator]::after, gr-kanban .gr-kanban-card[data-gr-card] { transition: none !important; }
+  .gr-spinner { animation-duration: 1.6s; }
+  .gr-toast__timer { display: none; }
+  .gr-tooltip[data-gr-tooltip]::after { animation: none !important; }
+}
+.gr-ui[data-gr-motion="reduce"] .gr-checkbox::after, .gr-ui[data-gr-motion="reduce"] .gr-switch-button::after, .gr-ui[data-gr-motion="reduce"] .gr-tab-list[data-gr-indicator]::after, .gr-ui[data-gr-motion="reduce"] gr-kanban .gr-kanban-card[data-gr-card] { transition: none !important; }
+.gr-ui[data-gr-motion="reduce"] .gr-toast__timer { display: none; }
+@media (forced-colors: active) {
+  .gr-status, .gr-chip, .gr-alert, .gr-stat-group { border-color: CanvasText; }
+  .gr-kanban-placeholder { border-color: Highlight; }
+}

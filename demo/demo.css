@@ -44,14 +44,15 @@ body.gr-ui { margin: 0; height: 100dvh; overflow: hidden; }
 .demo-foundations-card { padding: 0; overflow: hidden; }
 .demo-card-caption { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: var(--gr-text-sm); font-weight: 650; margin-bottom: 17px; }
 .demo-foundations-card > .demo-card-caption { padding: 17px 18px 0; }
-.demo-card-caption span:last-child:not(:first-child) { color: var(--gr-ink-muted); font-size: 11px; font-weight: 450; }
+.demo-card-caption > span:not(.gr-badge) { color: var(--gr-ink-muted); font-size: 11px; font-weight: 450; }
+.demo-install-panel .demo-card-caption > span { color: var(--gr-ink); font-size: var(--gr-text-sm); font-weight: 650; }
 .demo-swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 11px; padding: 0 18px 22px; }
 .demo-swatch { min-width: 0; display: grid; gap: 4px; }
 .demo-swatch i { height: 48px; background: var(--swatch); border: 1px solid var(--gr-line); border-radius: var(--gr-radius-sm); }
 .demo-swatch b { font-size: 11px; font-weight: 600; margin-top: 2px; }
 .demo-swatch code { color: var(--gr-ink-muted); font: 10px var(--gr-mono); overflow-wrap: anywhere; }
 .demo-top-border { border-top: 1px solid var(--gr-line); margin-top: 0 !important; padding-top: 16px !important; }
-.demo-preferences { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; align-items: end; padding: 0 18px 19px; }
+.demo-preferences { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; align-items: end; padding: 0 18px 19px; }
 .demo-preferences .gr-segmented { width: max-content; }
 .demo-preferences .gr-segmented button { display: flex; align-items: center; gap: 6px; }
 .demo-preferences .gr-segmented svg { width: 13px; height: 13px; }
@@ -274,3 +275,123 @@ body.gr-ui .gr-app-shell { min-height: 0; }
 @media (max-height: 800px) and (min-width: 761px) { .demo-sidebar-tip { display: none; }.gr-sidebar__footer { margin-top: auto; } }
 /* Header tooltips open inward rather than being clipped above the viewport. */
 .gr-topbar .gr-tooltip[data-gr-tooltip]:is(:hover, :focus-within)::after { top: calc(100% + 7px); bottom: auto; }
+
+
+/* ===================== v0.3 gallery ===================== */
+/* Docs: Preview / Code / API on every component card. */
+.demo-card-caption { flex-wrap: wrap; row-gap: 8px; }
+.demo-doc-switch { margin-left: auto; padding: 2px; }
+.demo-doc-switch button { padding: 3px 9px; font-size: 11px; }
+.demo-card-caption > span + .demo-doc-switch { margin-left: 12px; }
+.demo-example { min-width: 0; }
+.demo-code-view { position: relative; min-width: 0; }
+.demo-code-view[hidden], .demo-api[hidden], .demo-example[hidden] { display: none; }
+.demo-code { margin: 0; max-height: 360px; overflow: auto; padding: 14px 16px; border: 1px solid var(--gr-line); border-radius: var(--gr-radius-sm); background: var(--gr-surface-muted); color: var(--gr-ink-secondary); font: 11.5px/1.75 var(--gr-mono); tab-size: 2; white-space: pre; }
+.demo-code:focus-visible { outline: 2px solid var(--gr-accent); outline-offset: 2px; }
+.demo-code-copy { position: absolute; top: 8px; right: 8px; z-index: 1; }
+.demo-api { display: grid; gap: 16px; min-width: 0; font-size: var(--gr-text-sm); }
+.demo-api__block { display: grid; gap: 8px; min-width: 0; }
+.demo-api h4 { margin: 0; font: 600 12px var(--gr-mono); color: var(--gr-ink); }
+.demo-api p { margin: 0; color: var(--gr-ink-secondary); }
+.demo-api__classes { display: flex; flex-wrap: wrap; gap: 6px; }
+.demo-api code, .demo-component-note code { font: 11px var(--gr-mono); color: var(--gr-ink-secondary); background: var(--gr-surface-muted); border: 1px solid var(--gr-line); border-radius: 4px; padding: 1px 5px; overflow-wrap: anywhere; }
+.demo-api__table { border: 1px solid var(--gr-line); border-radius: var(--gr-radius-sm); }
+.demo-api__table td { white-space: normal; vertical-align: top; color: var(--gr-ink-secondary); }
+.demo-api__table td:first-child { width: 38%; }
+.demo-api__note { font-size: 11px; color: var(--gr-ink-muted) !important; }
+.demo-pattern-card > :is(.demo-code-view, .demo-api) { margin: 0 17px 17px; }
+.demo-pattern-card > .demo-component-note { padding: 0 17px 15px; margin-top: 4px !important; }
+.demo-stacked-card { margin-top: 13px; }
+.demo-stacked-grid { margin-top: 13px; }
+.demo-stat-card { margin-bottom: 13px; margin-top: 0; }
+
+/* Foundations extras */
+.demo-elevation { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; padding: 4px 18px 22px; }
+.demo-elevation > div { display: grid; gap: 8px; justify-items: start; min-width: 0; }
+.demo-elevation i { display: block; width: 100%; max-width: 96px; height: 44px; border-radius: var(--gr-radius-md); background: var(--gr-surface); }
+.demo-elevation .demo-radius { box-shadow: none; border: 1.5px solid var(--gr-line-strong); background: var(--gr-surface-muted); }
+.demo-elevation code { font: 10px var(--gr-mono); color: var(--gr-ink-muted); overflow-wrap: anywhere; }
+.demo-motion-pref { display: flex; align-items: center; gap: 8px; min-height: 36px; }
+.demo-motion-pref .gr-faint { font-size: 11px; }
+
+/* Motion section */
+.demo-curves { display: grid; gap: 14px; }
+.demo-curve { display: grid; grid-template-columns: 128px minmax(0, 1fr); align-items: center; gap: 4px 14px; }
+.demo-curve > span { display: grid; gap: 1px; font-size: 12px; }
+.demo-curve code { font: 10px var(--gr-mono); color: var(--gr-ink-muted); }
+.demo-curve small { grid-column: 2; font-size: 10px; color: var(--gr-ink-muted); }
+.demo-track { position: relative; height: 22px; border-radius: 999px; background: var(--gr-surface-muted); border: 1px solid var(--gr-line); }
+.demo-track i { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--gr-accent); box-shadow: 0 1px 3px rgb(0 0 0 / 20%); transition: left var(--demo-duration) var(--demo-ease); }
+.demo-curves.is-playing .demo-track i { left: calc(100% - 18px); }
+.demo-fx-stage { display: grid; gap: 14px; }
+.demo-fx-row { border: 1px solid var(--gr-line); border-radius: var(--gr-radius-sm); background: var(--gr-surface); }
+.demo-fx-row:last-child { border-bottom: 1px solid var(--gr-line); }
+.demo-fx-buttons { margin-top: 14px; }
+.gr-ui[data-gr-motion="reduce"] .demo-track i { transition: none; }
+@media (prefers-reduced-motion: reduce) { .demo-track i { transition: none; } }
+
+/* Pickers */
+.demo-picker-props { grid-template-columns: 90px minmax(0, 1fr); gap: 10px 12px; }
+.demo-picker-props dd { flex-wrap: wrap; }
+.demo-file-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--gr-line); border-radius: var(--gr-radius-sm); overflow: hidden; }
+.demo-file-list li { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 12px; font-size: var(--gr-text-sm); border-bottom: 1px solid var(--gr-line); cursor: context-menu; outline-offset: -2px; }
+.demo-file-list li:last-child { border-bottom: 0; }
+.demo-file-icon { display: inline-grid; place-items: center; width: 30px; height: 22px; border-radius: 4px; font: 700 8.5px var(--gr-mono); letter-spacing: .03em; color: var(--gr-danger); background: color-mix(in srgb, var(--gr-danger) 11%, transparent); }
+.demo-file-icon--violet { color: var(--gr-violet); background: color-mix(in srgb, var(--gr-violet) 12%, transparent); }
+.demo-file-icon--teal { color: var(--gr-teal); background: color-mix(in srgb, var(--gr-teal) 12%, transparent); }
+.gr-menu .demo-menu-danger { color: var(--gr-danger); }
+#demo-calendar { border: 1px solid var(--gr-line); border-radius: var(--gr-radius-md); padding: 8px; }
+
+/* Status section */
+.demo-glyph-row { gap: 10px 18px; }
+
+/* Task card extras */
+.demo-reset-link { font-size: 10px; color: var(--gr-ink-muted); font-weight: 500; }
+.demo-task-card .gr-task-row { transition: background var(--gr-motion); }
+.demo-task-card .gr-task-row[data-gr-context-item] { cursor: default; }
+
+/* Board */
+.demo-board-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.demo-board-wrap .gr-kanban-column { flex: 1 0 210px; }
+.demo-board-wrap .gr-kanban-column__heading .gr-status { width: 12px; height: 12px; }
+
+/* Drawer / confirm */
+.demo-detail-label { margin-bottom: 6px; color: var(--gr-ink-muted); font-weight: 500; }
+.demo-detail-delete { color: var(--gr-danger); }
+.demo-confirm { width: min(420px, calc(100vw - 32px)) !important; }
+.demo-confirm-body { grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 14px; padding: 22px 22px 18px; }
+.demo-confirm-body h2 { font-size: var(--gr-text-lg); font-weight: 650; margin-bottom: 6px; }
+.demo-confirm-body p { color: var(--gr-ink-secondary); font-size: var(--gr-text-sm); line-height: 1.6; }
+.demo-confirm-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--gr-danger); background: color-mix(in srgb, var(--gr-danger) 11%, transparent); }
+.demo-confirm-icon svg { width: 17px; height: 17px; }
+.demo-confirm .gr-dialog-footer { border-top: 0; padding-top: 0; }
+.demo-states { display: grid; gap: 4px; }
+.demo-states .gr-empty { padding: 18px 12px; border-bottom: 1px solid var(--gr-line); }
+.demo-loading-row { justify-content: center; padding: 16px 0 4px; font-size: var(--gr-text-sm); color: var(--gr-ink-secondary); }
+
+@media (max-width: 1160px) { .demo-elevation { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .demo-doc-switch { margin-left: 0; }
+  .demo-preferences .gr-segmented { width: auto; max-width: 100%; flex-wrap: wrap; }
+  .demo-elevation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .demo-curve { grid-template-columns: minmax(0, 1fr); }
+  .demo-curve small { grid-column: 1; }
+  .demo-picker-props { grid-template-columns: minmax(0, 1fr); }
+  .demo-picker-props dt { margin-top: 4px; }
+  .demo-board-foot { flex-direction: column; align-items: flex-start; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .demo-file-list li:hover { background: var(--gr-surface-muted); }
+}
+.demo-fx-pop { animation: gr-pop 360ms var(--gr-ease-spring) both; }
+
+/* Chinese gallery typography */
+.demo-hero h1:lang(zh) { letter-spacing: .01em; line-height: 1.25; font-weight: 640; }
+.demo-hero .gr-page-description:lang(zh) { max-width: 34em; line-height: 1.9; }
+:is(.demo-eyebrow, .demo-release, .demo-art-caption, .demo-side-intro, .demo-sidebar-tip .demo-eyebrow):lang(zh) { letter-spacing: .04em; }
+:is(.demo-preview-head h2, .demo-recipe > strong, .demo-sidebar-tip p, #detail-title, .demo-stat strong):lang(zh) { letter-spacing: 0; }
+.demo-lang-toggle { width: auto; min-width: var(--gr-control-md); padding: 0 8px; font-size: 11px; font-weight: 650; }
+.demo-lang-toggle span { font-family: var(--gr-font); }
+/* Avoid an English flash while a saved Chinese preference is applied (removed by demo.js, with a timeout fallback). */
+html.demo-i18n-pending .gr-app-shell { opacity: 0; }
+.gr-app-shell { transition: opacity 120ms; }

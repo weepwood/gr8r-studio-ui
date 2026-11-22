@@ -21,8 +21,20 @@
   --gr-danger-contrast: #fff;
   --gr-info: #286f9e;
   --gr-violet: #6e4eaa;
+  --gr-teal: #17736a;
+  --gr-rose: #a8385f;
+  --gr-orange: #995013;
   --gr-shadow: 0 1px 3px rgb(27 26 24 / 4%), 0 0 0 1px var(--gr-line);
   --gr-float-shadow: 0 18px 50px rgb(28 25 20 / 13%), 0 0 0 1px var(--gr-line);
+  --gr-shadow-card: 0 1px 2px rgb(27 26 24 / 4%);
+  --gr-shadow-hover: 0 6px 16px -6px rgb(27 26 24 / 14%), 0 1px 2px rgb(27 26 24 / 4%);
+  --gr-shadow-drag: 0 22px 40px -12px rgb(27 26 24 / 26%), 0 4px 10px rgb(27 26 24 / 8%);
+  --gr-focus-ring: 0 0 0 3px var(--gr-accent-wash);
+  --gr-z-sticky: 10;
+  --gr-z-dropdown: 25;
+  --gr-z-popover: 60;
+  --gr-z-toast: 100;
+  --gr-z-drag: 200;
   --gr-radius-xs: 4px;
   --gr-radius-sm: 6px;
   --gr-radius-md: 9px;
@@ -35,7 +47,8 @@
   --gr-space-5: 20px;
   --gr-space-6: 24px;
   --gr-space-8: 32px;
-  --gr-font: Inter, "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Latin faces first; CJK fallbacks so Chinese uses a proper Han face instead of a synthesized one. */
+  --gr-font: Inter, "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Noto Sans CJK SC", sans-serif;
   --gr-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
   --gr-text-xs: 11px;
   --gr-text-sm: 12px;
@@ -49,6 +62,13 @@
   --gr-motion: 160ms cubic-bezier(.2, .7, .25, 1);
   --gr-motion-fast: 120ms cubic-bezier(.2, 0, 0, 1);
   --gr-motion-panel: 210ms cubic-bezier(.2, 0, 0, 1);
+  /* Motion primitives: compose duration + easing for one-shot effects (see motion.css). */
+  --gr-ease-out: cubic-bezier(.2, .8, .2, 1);
+  --gr-ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --gr-ease-spring: cubic-bezier(.34, 1.45, .64, 1);
+  --gr-duration-fast: 120ms;
+  --gr-duration-base: 200ms;
+  --gr-duration-slow: 320ms;
   color-scheme: light;
 }
 :root[data-gr-theme="dark"],
@@ -72,8 +92,14 @@
   --gr-danger-contrast: #351917;
   --gr-info: #88bbdf;
   --gr-violet: #b99bdf;
+  --gr-teal: #6fcdc2;
+  --gr-rose: #ef9ab9;
+  --gr-orange: #eba066;
   --gr-shadow: 0 1px 5px rgb(0 0 0 / 18%), 0 0 0 1px var(--gr-line);
   --gr-float-shadow: 0 20px 65px rgb(0 0 0 / 46%), 0 0 0 1px var(--gr-line-strong);
+  --gr-shadow-card: 0 1px 2px rgb(0 0 0 / 22%);
+  --gr-shadow-hover: 0 8px 20px -8px rgb(0 0 0 / 55%), 0 1px 2px rgb(0 0 0 / 22%);
+  --gr-shadow-drag: 0 24px 48px -12px rgb(0 0 0 / 60%), 0 4px 12px rgb(0 0 0 / 30%);
   color-scheme: dark;
 }
 :root[data-gr-accent="teal"], .gr-ui[data-gr-accent="teal"] { --gr-accent: #18776e; --gr-accent-contrast: #fff; }
@@ -85,4 +111,50 @@
 .gr-ui[data-gr-density="compact"] { --gr-item-height: 34px; --gr-control-md: 30px; --gr-control-sm: 25px; }
 @media (prefers-reduced-motion: reduce) {
   .gr-ui { --gr-motion: 0ms; --gr-motion-fast: 0ms; --gr-motion-panel: 0ms; }
+}
+/* Explicit in-app preference, independent of the OS setting. */
+.gr-ui[data-gr-motion="reduce"] { --gr-motion: 0ms; --gr-motion-fast: 0ms; --gr-motion-panel: 0ms; }
+@supports (transition-timing-function: linear(0, 1)) {
+  :root, .gr-ui {
+    /* A gentle spring with a single small overshoot. */
+    --gr-ease-spring: linear(0, .009, .035 2.1%, .141 4.4%, .723 12.9%, .938 16.7%, 1.017 19.4%, 1.067 22%, 1.084 24.7%, 1.077 27.4%, 1.032 33.6%, 1.006 39.4%, .997 46.5%, 1);
+  }
+}
+
+/* theme="system": follow the OS without a script, so the first paint is already correct. */
+@media (prefers-color-scheme: dark) {
+  :root[data-gr-theme="system"],
+  .gr-ui[data-gr-theme="system"] {
+    --gr-canvas: #1b1b1a;
+    --gr-sidebar: #171716;
+    --gr-surface: #222220;
+    --gr-surface-muted: #282826;
+    --gr-surface-raised: #32312e;
+    --gr-line: #32312e;
+    --gr-line-strong: #45443f;
+    --gr-control-line: #929087;
+    --gr-ink: #eae8e3;
+    --gr-ink-secondary: #b5b1a9;
+    --gr-ink-muted: #a09c93;
+    --gr-accent: #9da8f7;
+    --gr-accent-contrast: #1d2449;
+    --gr-good: #76c3a0;
+    --gr-caution: #e6b65b;
+    --gr-danger: #ec928c;
+    --gr-danger-contrast: #351917;
+    --gr-info: #88bbdf;
+    --gr-violet: #b99bdf;
+    --gr-teal: #6fcdc2;
+    --gr-rose: #ef9ab9;
+    --gr-orange: #eba066;
+    --gr-shadow: 0 1px 5px rgb(0 0 0 / 18%), 0 0 0 1px var(--gr-line);
+    --gr-float-shadow: 0 20px 65px rgb(0 0 0 / 46%), 0 0 0 1px var(--gr-line-strong);
+    --gr-shadow-card: 0 1px 2px rgb(0 0 0 / 22%);
+    --gr-shadow-hover: 0 8px 20px -8px rgb(0 0 0 / 55%), 0 1px 2px rgb(0 0 0 / 22%);
+    --gr-shadow-drag: 0 24px 48px -12px rgb(0 0 0 / 60%), 0 4px 12px rgb(0 0 0 / 30%);
+    color-scheme: dark;
+  }
+  :root[data-gr-theme="system"][data-gr-accent="teal"], .gr-ui[data-gr-theme="system"][data-gr-accent="teal"] { --gr-accent: #78d3c9; --gr-accent-contrast: #122c2a; }
+  :root[data-gr-theme="system"][data-gr-accent="rose"], .gr-ui[data-gr-theme="system"][data-gr-accent="rose"] { --gr-accent: #ef9ab9; --gr-accent-contrast: #462534; }
+  :root[data-gr-theme="system"][data-gr-accent="graphite"], .gr-ui[data-gr-theme="system"][data-gr-accent="graphite"] { --gr-accent: #d7d5ce; --gr-accent-contrast: #20201e; }
 }

@@ -1,0 +1,99 @@
+/* Floating surfaces, drawers and pickers (gr-popover, gr-select, gr-context-menu, gr-calendar, gr-drawer). */
+
+/* Base for every floating surface. Overrides UA [popover] defaults (inset/margin/colours). */
+.gr-ui .gr-floating { inset: auto; margin: 0; z-index: var(--gr-z-popover); color: var(--gr-ink); }
+.gr-ui .gr-floating[hidden] { display: none !important; }
+.gr-ui .gr-menu.gr-floating { position: fixed; min-width: 190px; }
+
+.gr-popover { min-width: 220px; max-width: min(340px, calc(100vw - 16px)); max-height: min(420px, calc(100dvh - 24px)); overflow: auto; overscroll-behavior: contain; padding: 5px; border: 1px solid var(--gr-line); border-radius: var(--gr-radius-md); background: var(--gr-surface); box-shadow: var(--gr-float-shadow); }
+.gr-popover--padded { padding: 12px; }
+.gr-popover__filter { width: 100%; margin-bottom: 4px; border: 0; border-bottom: 1px solid var(--gr-line); border-radius: 0; padding: 8px 9px; background: transparent; outline: 0; font-size: var(--gr-text-sm); }
+.gr-popover__empty { margin: 0; padding: 14px 10px; color: var(--gr-ink-muted); font-size: var(--gr-text-sm); text-align: center; }
+.gr-popover__empty[hidden] { display: none; }
+.gr-popover__heading { padding: 6px 9px 4px; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--gr-ink-muted); }
+.gr-popover [role="listbox"] { display: grid; gap: 1px; }
+.gr-popover [role="option"] { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 31px; padding: 5px 9px; border: 0; border-radius: 5px; background: transparent; text-align: left; font-size: var(--gr-text-sm); color: var(--gr-ink); }
+.gr-popover [role="option"][hidden] { display: none; }
+.gr-popover [role="option"]:focus-visible { outline: 2px solid var(--gr-accent); outline-offset: -2px; background: var(--gr-surface-muted); }
+.gr-popover [role="option"][aria-selected="true"] { font-weight: 600; }
+.gr-popover [role="option"][aria-selected="true"]::after,
+.gr-listbox__option[aria-selected="true"]::after { content: ""; margin-left: auto; width: 9px; height: 5px; border-left: 1.8px solid var(--gr-accent); border-bottom: 1.8px solid var(--gr-accent); transform: translateY(-2px) rotate(-45deg); flex: 0 0 auto; }
+.gr-popover [role="option"][aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+
+/* Picker trigger: a compact, borderless button that shows the current value. */
+.gr-picker { display: inline-flex; align-items: center; gap: 7px; min-height: var(--gr-control-sm); padding: 0 9px; border: 1px solid var(--gr-line); border-radius: var(--gr-radius-sm); background: var(--gr-surface); color: var(--gr-ink); font-size: var(--gr-text-sm); font-weight: 500; white-space: nowrap; transition: background var(--gr-motion), border-color var(--gr-motion); }
+.gr-picker[aria-expanded="true"] { border-color: var(--gr-accent); box-shadow: var(--gr-focus-ring); }
+.gr-picker__placeholder { color: var(--gr-ink-muted); }
+
+/* gr-select: native select stays in the DOM (forms, value), the button is what users operate. */
+.gr-ui gr-select { position: relative; display: block; min-width: 0; }
+.gr-select-native { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; opacity: 0; pointer-events: none; }
+.gr-select-trigger { display: flex; align-items: center; gap: 8px; text-align: left; cursor: pointer; position: relative; }
+.gr-select-trigger::after { content: ""; position: absolute; right: 12px; top: 50%; width: 6px; height: 6px; border-right: 1.6px solid var(--gr-ink-muted); border-bottom: 1.6px solid var(--gr-ink-muted); transform: translateY(-70%) rotate(45deg); transition: transform var(--gr-motion); }
+.gr-select-trigger[aria-expanded="true"] { border-color: var(--gr-accent); box-shadow: var(--gr-focus-ring); }
+.gr-select-trigger[aria-expanded="true"]::after { transform: translateY(-25%) rotate(225deg); }
+.gr-select-trigger__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+.gr-select-trigger__value.has-dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gr-dot); flex: 0 0 auto; }
+.gr-listbox { min-width: 180px; max-height: min(300px, calc(100dvh - 24px)); overflow-y: auto; overscroll-behavior: contain; padding: 5px; border: 1px solid var(--gr-line); border-radius: var(--gr-radius-md); background: var(--gr-surface); box-shadow: var(--gr-float-shadow); font-size: var(--gr-text-sm); }
+.gr-listbox__group { padding: 7px 9px 3px; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--gr-ink-muted); }
+.gr-listbox__option { display: flex; align-items: center; gap: 9px; min-height: 31px; padding: 5px 9px; border-radius: 5px; cursor: pointer; }
+.gr-listbox__option.is-active { background: var(--gr-surface-muted); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--gr-accent) 40%, transparent); }
+.gr-listbox__option[aria-selected="true"] { font-weight: 600; }
+.gr-listbox__option[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+.gr-listbox__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gr-dot); flex: 0 0 auto; }
+.gr-listbox__text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* gr-calendar */
+.gr-calendar { display: inline-grid; gap: 6px; padding: 4px; user-select: none; }
+.gr-calendar__header { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.gr-calendar__label { font-size: var(--gr-text-sm); font-weight: 650; }
+.gr-calendar__nav { width: 28px; min-height: 28px; font-size: 17px; line-height: 1; }
+.gr-calendar__grid { border-collapse: separate; border-spacing: 2px; }
+.gr-calendar__grid th { width: 32px; padding: 3px 0; font-size: 10px; font-weight: 600; color: var(--gr-ink-muted); text-align: center; }
+.gr-calendar__grid td { padding: 0; }
+.gr-calendar__day { display: grid; place-items: center; width: 32px; height: 30px; border: 0; border-radius: var(--gr-radius-sm); background: transparent; color: var(--gr-ink); font-size: var(--gr-text-sm); font-variant-numeric: tabular-nums; transition: background var(--gr-motion-fast), color var(--gr-motion-fast); }
+.gr-calendar__day[data-outside] { color: var(--gr-ink-muted); opacity: .7; }
+.gr-calendar__day[aria-current="date"] { color: var(--gr-accent); font-weight: 700; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gr-accent) 40%, transparent); }
+.gr-calendar__day[aria-pressed="true"] { background: var(--gr-accent); color: var(--gr-accent-contrast); font-weight: 650; box-shadow: none; opacity: 1; }
+.gr-calendar__day:disabled { opacity: .3; cursor: not-allowed; }
+.gr-calendar__day:focus-visible { outline: 2px solid var(--gr-accent); outline-offset: 1px; }
+
+/* gr-drawer: a modal side sheet. */
+.gr-ui gr-drawer dialog.gr-drawer { position: fixed; inset: 0 0 0 auto; width: min(460px, 100vw); max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; border: 0; border-left: 1px solid var(--gr-line); border-radius: 0; background: var(--gr-surface); color: var(--gr-ink); box-shadow: var(--gr-float-shadow); display: flex; flex-direction: column; overflow: hidden; overscroll-behavior: contain; transform: translateX(100%); transition: transform var(--gr-motion-panel), display var(--gr-motion-panel) allow-discrete, overlay var(--gr-motion-panel) allow-discrete; }
+.gr-ui gr-drawer dialog.gr-drawer:not([open]) { display: none; }
+.gr-ui gr-drawer dialog.gr-drawer[data-side="start"] { inset: 0 auto 0 0; border-left: 0; border-right: 1px solid var(--gr-line); transform: translateX(-100%); }
+.gr-ui gr-drawer dialog.gr-drawer[open] { transform: none; }
+@starting-style { .gr-ui gr-drawer dialog.gr-drawer[open] { transform: translateX(100%); } .gr-ui gr-drawer dialog.gr-drawer[data-side="start"][open] { transform: translateX(-100%); } }
+.gr-ui gr-drawer dialog.gr-drawer::backdrop { background: rgb(13 13 15 / 32%); transition: background-color var(--gr-motion-panel), display var(--gr-motion-panel) allow-discrete, overlay var(--gr-motion-panel) allow-discrete; }
+@starting-style { .gr-ui gr-drawer dialog.gr-drawer[open]::backdrop { background: rgb(13 13 15 / 0%); } }
+.gr-drawer .gr-dialog-header { flex: 0 0 auto; }
+.gr-drawer__body { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: grid; align-content: start; gap: 18px; }
+.gr-drawer .gr-dialog-footer { flex: 0 0 auto; margin-top: auto; }
+/* Property rows inside drawers: label column + value column. */
+.gr-props { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 8px 12px; font-size: var(--gr-text-sm); }
+.gr-props dt { color: var(--gr-ink-muted); }
+.gr-props dd { margin: 0; min-width: 0; display: flex; align-items: center; gap: 8px; }
+/* Drawer contents enter just after the sheet arrives. */
+.gr-drawer[open] .gr-drawer__body > * { animation: gr-rise-in 300ms var(--gr-ease-out) both; }
+.gr-drawer[open] .gr-drawer__body > :nth-child(2) { animation-delay: 30ms; }
+.gr-drawer[open] .gr-drawer__body > :nth-child(3) { animation-delay: 60ms; }
+.gr-drawer[open] .gr-drawer__body > :nth-child(n + 4) { animation-delay: 90ms; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gr-popover [role="option"]:hover:not([aria-disabled="true"]), .gr-listbox__option:hover:not([aria-disabled="true"]) { background: var(--gr-surface-muted); }
+  .gr-picker:hover { background: var(--gr-surface-muted); border-color: var(--gr-line-strong); }
+  .gr-calendar__day:hover:not(:disabled):not([aria-pressed="true"]) { background: var(--gr-surface-raised); }
+}
+@media (pointer: coarse) {
+  .gr-popover [role="option"], .gr-listbox__option { min-height: 40px; }
+  .gr-calendar__day { width: 38px; height: 38px; }
+  .gr-popover__filter { font-size: 16px; }
+}
+@media (max-width: 520px) { .gr-ui gr-drawer dialog.gr-drawer { width: 100vw; border-left: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .gr-ui gr-drawer dialog.gr-drawer, .gr-ui gr-drawer dialog.gr-drawer[data-side="start"] { transform: none; transition-property: opacity, display, overlay; }
+  .gr-drawer[open] .gr-drawer__body > * { animation: none; }
+}
+.gr-ui[data-gr-motion="reduce"] gr-drawer dialog.gr-drawer { transform: none; transition: none; }
+.gr-ui[data-gr-motion="reduce"] .gr-drawer[open] .gr-drawer__body > * { animation: none; }
+@media (forced-colors: active) { .gr-popover, .gr-listbox, .gr-drawer { border: 1px solid CanvasText; } }

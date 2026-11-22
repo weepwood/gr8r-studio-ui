@@ -2,13 +2,13 @@
  * Independent, framework-neutral interaction primitives.
  * The component DOM remains in the light tree so regular CSS and app events work.
  */
-const ElementBase = typeof HTMLElement === "undefined" ? class {} : HTMLElement;
-let autoId = 0;
-const nextId = prefix => `${prefix}-${++autoId}`;
+import { ElementBase, emit, nextId } from "./internal.js";
+import { grT } from "./i18n.js";
+import { GrPopover, GrSelect, GrContextMenu } from "./overlays.js";
+import { GrKanban } from "./board.js";
+import { GrCalendar } from "./calendar.js";
 
-function emit(host, name, detail) {
-  host.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
-}
+export { GrPopover, GrSelect, GrContextMenu, GrKanban, GrCalendar };
 
 export class GrSwitch extends ElementBase {
   static get observedAttributes() { return ["checked", "disabled", "aria-label"]; }
@@ -19,7 +19,7 @@ export class GrSwitch extends ElementBase {
       this.button.type = "button";
       this.button.classList.add("gr-switch-button");
       this.button.setAttribute("role", "switch");
-      this.button.setAttribute("aria-label", this.getAttribute("aria-label") || "Toggle");
+      this.button.setAttribute("aria-label", this.getAttribute("aria-label") || grT(this, "switch.toggle"));
       this._click = () => {
         if (!this.hasAttribute("disabled")) {
           this.checked = !this.checked;
@@ -37,9 +37,10 @@ export class GrSwitch extends ElementBase {
   sync() {
     if (!this.button) return;
     this.button.setAttribute("aria-checked", String(this.checked));
-    this.button.setAttribute("aria-label", this.getAttribute("aria-label") || "Toggle");
+    this.button.setAttribute("aria-label", this.getAttribute("aria-label") || grT(this, "switch.toggle"));
     this.button.disabled = this.hasAttribute("disabled");
   }
+  localize() { this.sync(); }
 }
 
 export class GrTabs extends ElementBase {
@@ -67,12 +68,31 @@ export class GrTabs extends ElementBase {
     };
     this.addEventListener("click", this._click);
     this.addEventListener("keydown", this._keys);
+    this.tablist = this.tabs[0]?.closest('[role="tablist"]');
     const selected = this.tabs.find(tab => tab.getAttribute("aria-selected") === "true" && !tab.disabled) || this.tabs.find(tab => !tab.disabled);
     if (selected) this.activate(selected, false);
+    // The sliding indicator follows layout changes (fonts, density, hidden parents becoming visible).
+    if (this.tablist && typeof ResizeObserver === "function") {
+      this._resize = new ResizeObserver(() => this.moveIndicator(false));
+      this._resize.observe(this.tablist);
+      for (const tab of this.tabs) this._resize.observe(tab);
+    }
   }
   disconnectedCallback() {
     this.removeEventListener("click", this._click);
     this.removeEventListener("keydown", this._keys);
+    this._resize?.disconnect();
+  }
+  moveIndicator(animate = true) {
+    const list = this.tablist;
+    const tab = this.tabs?.find(item => item.getAttribute("aria-selected") === "true");
+    if (!list || !tab || !tab.offsetWidth) return;
+    if (!animate || !list.hasAttribute("data-gr-indicator")) list.setAttribute("data-gr-indicator", "instant");
+    list.style.setProperty("--gr-indicator-x", tab.offsetLeft + "px");
+    list.style.setProperty("--gr-indicator-w", tab.offsetWidth + "px");
+    if (list.getAttribute("data-gr-indicator") === "instant") {
+      requestAnimationFrame(() => requestAnimationFrame(() => list.setAttribute("data-gr-indicator", "ready")));
+    }
   }
   activate(next, notify = true) {
     if (!next || next.disabled) return;
@@ -83,6 +103,7 @@ export class GrTabs extends ElementBase {
       const panel = this.panels.find(item => item.id === tab.getAttribute("aria-controls"));
       if (panel) panel.hidden = !selected;
     }
+    this.moveIndicator(notify);
     if (notify) emit(this, "gr-change", { tab: next.id || next.textContent.trim() });
   }
 }
@@ -114,6 +135,19 @@ export class GrDialog extends ElementBase {
     emit(this, "gr-open", {});
   }
   close(value) { if (this.dialog?.open) this.dialog.close(value); }
+}
+
+/**
+ * <gr-drawer side="end"><dialog aria-labelledby="…">…</dialog></gr-drawer>
+ * A modal side sheet (task details, filters, settings). Same API and events as gr-dialog;
+ * it slides in from the inline end (or `side="start"`).
+ */
+export class GrDrawer extends GrDialog {
+  connectedCallback() {
+    super.connectedCallback();
+    this.dialog?.classList.add("gr-drawer");
+    if (this.dialog) this.dialog.dataset.side = this.getAttribute("side") === "start" ? "start" : "end";
+  }
 }
 
 export class GrDropdown extends ElementBase {
@@ -198,13 +232,16 @@ export class GrToastStack extends ElementBase {
     this.setAttribute("aria-live", "polite");
     this.setAttribute("aria-atomic", "false");
   }
+  localize() {
+    for (const button of this.querySelectorAll(".gr-toast__close")) button.setAttribute("aria-label", grT(this, "toast.dismiss"));
+  }
 
   /**
    * Toasts enter/leave with interruptible CSS transitions.
    * Pausing on hover/focus prevents a notification from disappearing while read.
    */
   push(message, options = {}) {
-    const { tone = "neutral", duration = 4200 } = options;
+    const { tone = "neutral", duration = 4200, action } = options;
     const toast = document.createElement("div");
     toast.className = "gr-toast";
     toast.dataset.tone = tone;
@@ -219,9 +256,22 @@ export class GrToastStack extends ElementBase {
     label.textContent = String(message);
     const close = document.createElement("button");
     close.type = "button";
-    close.setAttribute("aria-label", "Dismiss notification");
+    close.className = "gr-toast__close";
+    close.setAttribute("aria-label", grT(this, "toast.dismiss"));
     close.textContent = "×";
-    toast.append(dot, label, close);
+    toast.append(dot, label);
+    if (action && typeof action.label === "string") {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "gr-toast__action";
+      button.textContent = action.label;
+      button.addEventListener("click", () => {
+        const keepOpen = action.onClick?.(toast) === false;
+        if (!keepOpen) dismiss();
+      });
+      toast.append(button);
+    }
+    toast.append(close);
 
     const motionOff = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
     let timer;
@@ -249,13 +299,23 @@ export class GrToastStack extends ElementBase {
       if (leaving || !timer) return;
       clearTimeout(timer);
       timer = undefined;
+      toast.dataset.paused = "true";
       remaining = Math.max(0, remaining - (performance.now() - startedAt));
     };
     const resume = () => {
       if (leaving || timer || remaining <= 0 || pausedByPointer || toast.contains(document.activeElement)) return;
+      delete toast.dataset.paused;
       startedAt = performance.now();
       timer = setTimeout(dismiss, remaining);
     };
+    if (remaining > 0) {
+      // A quiet countdown shows that the notice will go away (and that hovering pauses it).
+      const meter = document.createElement("span");
+      meter.className = "gr-toast__timer";
+      meter.setAttribute("aria-hidden", "true");
+      meter.style.setProperty("--gr-toast-duration", remaining + "ms");
+      toast.append(meter);
+    }
 
     toast.addEventListener("transitionend", event => {
       if (leaving && event.target === toast && event.propertyName === "opacity") finish();
@@ -288,7 +348,7 @@ export class GrCommandPalette extends ElementBase {
 
     this.list.id ||= nextId("gr-command-list");
     this.list.setAttribute("role", "listbox");
-    this.list.setAttribute("aria-label", "Commands");
+    if (!this.list.hasAttribute("aria-label") || this._autoListLabel) { this._autoListLabel = true; this.list.setAttribute("aria-label", grT(this, "command.list")); }
     this.input.setAttribute("role", "combobox");
     this.input.setAttribute("aria-autocomplete", "list");
     this.input.setAttribute("aria-controls", this.list.id);
@@ -303,7 +363,7 @@ export class GrCommandPalette extends ElementBase {
     this.empty = this.querySelector("[data-gr-command-empty]") || document.createElement("p");
     this.empty.setAttribute("data-gr-command-empty", "");
     this.empty.className = "gr-command-empty";
-    this.empty.textContent = "No matching commands";
+    this.empty.textContent = grT(this, "command.empty");
     this.empty.hidden = true;
     this.empty.setAttribute("role", "status");
     this.list.append(this.empty);
@@ -352,6 +412,10 @@ export class GrCommandPalette extends ElementBase {
     this.dialog?.removeEventListener("close", this._closed);
   }
   get visible() { return (this.commands || []).filter(entry => !entry.hidden); }
+  localize() {
+    if (this.empty) this.empty.textContent = grT(this, "command.empty");
+    if (this._autoListLabel) this.list?.setAttribute("aria-label", grT(this, "command.list"));
+  }
   mark(item) {
     for (const entry of this.commands || []) entry.setAttribute("aria-selected", String(entry === item));
     if (item) {
@@ -381,7 +445,13 @@ export const ELEMENTS = {
   "gr-switch": GrSwitch,
   "gr-tabs": GrTabs,
   "gr-dialog": GrDialog,
+  "gr-drawer": GrDrawer,
   "gr-dropdown": GrDropdown,
+  "gr-popover": GrPopover,
+  "gr-select": GrSelect,
+  "gr-context-menu": GrContextMenu,
+  "gr-calendar": GrCalendar,
+  "gr-kanban": GrKanban,
   "gr-toast-stack": GrToastStack,
   "gr-command-palette": GrCommandPalette
 };

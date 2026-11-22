@@ -32,7 +32,7 @@ jobs:
           name: browser-test-results-${{ github.run_attempt }}
           path: test-results/
       - name: Confirm static files exist
-        run: test -s dist/index.html && test -s dist/src/index.css && test -s dist/demo/demo.js && test -s dist/demo/state.js
+        run: test -s dist/index.html && test -s dist/src/index.css && test -s dist/demo/demo.js && test -s dist/demo/state.js && test -s dist/demo/docs.js && test -s dist/src/motion.css && test -s dist/src/overlays.js && test -s dist/src/i18n.js && test -s dist/demo/i18n.js
       # Package once in the producer job. Retrying only deployment must not
       # upload another artifact with the same name in this workflow run.
       - name: Upload Pages artifact

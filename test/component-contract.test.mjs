@@ -3,9 +3,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { ELEMENTS, applyGr8rPreferences, defineGr8rElements } from "../src/index.js";
 
-test("six independent custom elements are published", () => {
+test("twelve independent custom elements are published", () => {
   assert.deepEqual(Object.keys(ELEMENTS).sort(), [
-    "gr-command-palette", "gr-dialog", "gr-dropdown", "gr-switch",
+    "gr-calendar", "gr-command-palette", "gr-context-menu", "gr-dialog", "gr-drawer",
+    "gr-dropdown", "gr-kanban", "gr-popover", "gr-select", "gr-switch",
     "gr-tabs", "gr-toast-stack"
   ]);
 });
@@ -21,7 +22,7 @@ test("element registration is idempotent", () => {
   };
   defineGr8rElements(registry);
   defineGr8rElements(registry);
-  assert.equal(constructors.size, 6);
+  assert.equal(constructors.size, Object.keys(ELEMENTS).length);
 });
 
 test("preferences are validated and scoped to the target", () => {
@@ -37,7 +38,7 @@ test("preferences are validated and scoped to the target", () => {
   assert.throws(() => applyGr8rPreferences(null, {}), TypeError);
 });
 
-test("gallery exercises all six custom element tags", async () => {
+test("gallery exercises every custom element tag", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   for (const tag of Object.keys(ELEMENTS)) {
     assert.ok(html.includes("<" + tag), "Missing gallery example for " + tag);

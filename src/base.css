@@ -22,3 +22,9 @@
 .gr-ui :where(button, a, [role="tab"]) { touch-action: manipulation; }
 .gr-ui :where(h1, h2, h3) { overflow-wrap: anywhere; }
 .gr-ui :where(a, button, input, select, textarea):focus-visible { scroll-margin-block: 80px; }
+
+/* CJK typography: Han characters need neutral tracking and a little more leading. */
+.gr-ui:lang(zh), .gr-ui :lang(zh) { line-break: strict; }
+.gr-ui:lang(zh) { line-height: 1.6; }
+.gr-ui :is(h1, h2, h3, h4, .gr-page-title, .gr-card__title, .gr-sidebar__brand, .gr-dialog-header h2):lang(zh) { letter-spacing: 0; }
+.gr-ui :is(.gr-sidebar__heading, .gr-popover__heading, .gr-listbox__group):lang(zh) { letter-spacing: .02em; }

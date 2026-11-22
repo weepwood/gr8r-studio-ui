@@ -82,9 +82,10 @@ test("status picker and date picker update their triggers and restore focus", as
 });
 
 test("assignee picker filters as you type", async ({ page }) => {
-  await page.getByRole("button", { name: "Assignee: Jordan Wells", exact: true }).click();
-  await page.getByRole("searchbox", { name: "Filter people" }).fill("mor");
-  await expect(page.getByRole("option")).toHaveCount(1);
+  const picker = page.locator('gr-popover[data-demo-picker="assignee"]');
+  await picker.getByRole("button", { name: "Assignee: Jordan Wells", exact: true }).click();
+  await picker.getByRole("searchbox", { name: "Filter people" }).fill("mor");
+  await expect(picker.getByRole("option")).toHaveCount(1);
   await page.keyboard.press("Enter");
   await expect(page.getByRole("button", { name: "Assignee: Morgan Kim", exact: true })).toBeFocused();
 });

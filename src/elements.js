@@ -378,6 +378,11 @@ export class GrCommandPalette extends ElementBase {
     };
     this._keys = event => {
       if (event.target !== this.input) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        this.close();
+        return;
+      }
       const choices = this.visible;
       const i = choices.findIndex(item => item.getAttribute("aria-selected") === "true");
       if (["ArrowDown", "ArrowUp"].includes(event.key) && choices.length) {

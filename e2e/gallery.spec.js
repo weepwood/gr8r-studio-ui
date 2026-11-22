@@ -43,7 +43,7 @@ test("create, read details, persist, delete and undo a task with text-safe conte
   await expect(page.getByRole("button", { name: "Task details: " + title, exact: true })).toBeFocused();
   await page.getByRole("button", { name: "Delete task: " + title, exact: true }).click();
   await expect(rows(page)).toHaveCount(4);
-  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await page.locator("#toast-stack").getByRole("button", { name: "Undo", exact: true }).click();
   await expect(rows(page)).toHaveCount(5);
   await page.reload();
   await expect(rows(page)).toHaveCount(5);
